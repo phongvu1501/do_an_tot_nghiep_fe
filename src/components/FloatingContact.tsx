@@ -4,7 +4,7 @@ import { SiZalo } from "react-icons/si";
 
 const FloatingContact: React.FC = () => {
   return (
-    <div className="fixed right-6 bottom-8 flex flex-col items-center gap-4 z-50">
+    <div className="fixed right-6 bottom-32 flex flex-col items-center gap-4 z-50">
       <a
         href="https://zalo.me/0366744340"
         target="_blank"

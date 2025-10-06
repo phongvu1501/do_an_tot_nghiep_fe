@@ -1,11 +1,15 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { phone } from "./ContactSection/ContactSection";
 import colors from "../config/colors";
+import RegisterPopup from "./auth/RegisterPopup";
+import { phone } from "./ContactSection/ContactSection";
+import LoginPopup from "./auth/LoginPopup";
+import { usePopup } from "../hooks/usePopup";
 
 const Header: React.FC = () => {
-  const [openlogin, setOpenLogin] = useState(false);
+  const [openAuth, setOpenAuth] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { openPopup } = usePopup();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -13,7 +17,7 @@ const Header: React.FC = () => {
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setOpenLogin(false);
+        setOpenAuth(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -90,17 +94,20 @@ const Header: React.FC = () => {
 
               <div className="relative" ref={dropdownRef}>
                 <button
-                  onClick={() => setOpenLogin(!openlogin)}
+                  onClick={() => setOpenAuth(!openAuth)}
                   className="flex items-center space-x-1 text-white text-sm font-medium hover:text-orange-500 transition-colors"
                 >
                   <span>Tài khoản</span>
                 </button>
 
-                {openlogin && (
+                {openAuth && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                    <Link
-                      to="/login"
-                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
+                    <button
+                      onClick={() => {
+                        openPopup("login");
+                        setOpenAuth(false);
+                      }}
+                      className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
                     >
                       <div className="flex items-center space-x-2">
                         <svg
@@ -118,11 +125,14 @@ const Header: React.FC = () => {
                         </svg>
                         <span>Đăng nhập</span>
                       </div>
-                    </Link>
+                    </button>
                     <div className="border-t border-gray-100 my-1"></div>
-                    <Link
-                      to="/register"
-                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
+                    <button
+                      onClick={() => {
+                        openPopup("register");
+                        setOpenAuth(false);
+                      }}
+                      className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
                     >
                       <div className="flex items-center space-x-2">
                         <svg
@@ -140,7 +150,7 @@ const Header: React.FC = () => {
                         </svg>
                         <span>Đăng ký</span>
                       </div>
-                    </Link>
+                    </button>
                   </div>
                 )}
               </div>
@@ -169,6 +179,9 @@ const Header: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <RegisterPopup />
+      <LoginPopup />
     </header>
   );
 };
