@@ -1,0 +1,3 @@
+export const address = "13 Trịnh Văn Bô, Từ Liêm, Hà Nội";
+export const mapUrl = `https://www.google.com/maps/place/13+Tr%E1%BB%8Bnh+V%C4%83n+B%C3%B4,+Xu%C3%A2n+Ph%C6%B0%C6%A1ng,+Nam+T%E1%BB%AB+Li%C3%AAm,+H%C3%A0+N%E1%BB%99i/@21.0381028,105.7441619,17z/data=!3m1!4b1!4m6!3m5!1s0x3134548d62b444d5:0xe568bbce36a57a7b!8m2!3d21.0381028!4d105.7467368!16s%2Fg%2F11ql1dt826?entry=ttu&g_ep=EgoyMDI1MTAwMS4wIKXMDSoASAFQAw%3D%3D`;
+export const phone = "19000000"
