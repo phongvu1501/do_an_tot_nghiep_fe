@@ -4,8 +4,20 @@ import colors from "../config/colors";
 
 const Footer: React.FC = () => {
   return (
-    <footer style={{ backgroundColor: "#1B4E30" }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="relative overflow-hidden">
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      >
+        <source src="/Bia-Web.mp4" type="video/mp4" />
+      </video>
+
+      <div className="absolute inset-0 bg-black/5 z-10"></div>
+
+      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
@@ -15,18 +27,19 @@ const Footer: React.FC = () => {
             </div>
 
             <button
-              className="px-6 py-2 border text-white transition-colors duration-300 rounded"
+              className="px-6 py-2 border transition-colors duration-300 rounded"
               style={{
-                backgroundColor: colors.primary.green,
-                borderColor: colors.primary.yellow,
+                backgroundColor: "white",
+                borderColor: colors.primary.green,
+                color: colors.primary.green,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = colors.primary.yellow;
-                e.currentTarget.style.color = colors.primary.green;
-              }}
-              onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = colors.primary.green;
                 e.currentTarget.style.color = "white";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "white";
+                e.currentTarget.style.color = colors.primary.green;
               }}
             >
               ĐẶT BÀN
@@ -38,7 +51,8 @@ const Footer: React.FC = () => {
               <li>
                 <a
                   href="#"
-                  className="text-white hover:text-yellow-400 transition-colors"
+                  className="transition-colors"
+                  style={{ color: colors.primary.green }}
                 >
                   Thực đơn
                 </a>
@@ -46,7 +60,8 @@ const Footer: React.FC = () => {
               <li>
                 <a
                   href="#"
-                  className="text-white hover:text-yellow-400 transition-colors"
+                  className="transition-colors"
+                  style={{ color: colors.primary.green }}
                 >
                   Giới thiệu
                 </a>
@@ -54,7 +69,8 @@ const Footer: React.FC = () => {
               <li>
                 <a
                   href="#"
-                  className="text-white hover:text-yellow-400 transition-colors"
+                  className="transition-colors"
+                  style={{ color: colors.primary.green }}
                 >
                   Ưu đãi
                 </a>
@@ -62,7 +78,8 @@ const Footer: React.FC = () => {
               <li>
                 <a
                   href="#"
-                  className="text-white hover:text-yellow-400 transition-colors"
+                  className="transition-colors"
+                  style={{ color: colors.primary.green }}
                 >
                   Liên hệ
                 </a>
@@ -72,12 +89,19 @@ const Footer: React.FC = () => {
 
           <div className="space-y-3">
             <div>
-              <span className="text-white">Hotline: </span>
-              <span className="text-yellow-400 font-bold">{phone}</span>
+              <span style={{ color: colors.primary.green }}>Hotline: </span>
+              <span
+                className="font-bold"
+                style={{ color: colors.primary.green }}
+              >
+                {phone}
+              </span>
             </div>
             <div>
-              <span className="text-white">Email: </span>
-              <span className="text-yellow-400">datban@gmail.com</span>
+              <span style={{ color: colors.primary.green }}>Email: </span>
+              <span style={{ color: colors.primary.green }}>
+                datban@gmail.com
+              </span>
             </div>
           </div>
 
@@ -85,16 +109,40 @@ const Footer: React.FC = () => {
             <div className="flex space-x-3">
               <a
                 href="#"
-                className="w-10 h-10 rounded-full border border-white flex items-center justify-center hover:bg-yellow-400 hover:border-yellow-400 transition-colors"
+                className="w-10 h-10 rounded-full border flex items-center justify-center transition-colors"
+                style={{
+                  borderColor: colors.primary.green,
+                  color: colors.primary.green,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary.green;
+                  e.currentTarget.style.color = "white";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.color = colors.primary.green;
+                }}
               >
-                <span className="text-white text-sm font-bold">f</span>
+                <span className="text-sm font-bold">f</span>
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full border border-white flex items-center justify-center hover:bg-yellow-400 hover:border-yellow-400 transition-colors"
+                className="w-10 h-10 rounded-full border flex items-center justify-center transition-colors"
+                style={{
+                  borderColor: colors.primary.green,
+                  color: colors.primary.green,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary.green;
+                  e.currentTarget.style.color = "white";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.color = colors.primary.green;
+                }}
               >
                 <svg
-                  className="w-5 h-5 text-white"
+                  className="w-5 h-5"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -103,10 +151,22 @@ const Footer: React.FC = () => {
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full border border-white flex items-center justify-center hover:bg-yellow-400 hover:border-yellow-400 transition-colors"
+                className="w-10 h-10 rounded-full border flex items-center justify-center transition-colors"
+                style={{
+                  borderColor: colors.primary.green,
+                  color: colors.primary.green,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary.green;
+                  e.currentTarget.style.color = "white";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.color = colors.primary.green;
+                }}
               >
                 <svg
-                  className="w-5 h-5 text-white"
+                  className="w-5 h-5"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -115,10 +175,22 @@ const Footer: React.FC = () => {
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full border border-white flex items-center justify-center hover:bg-yellow-400 hover:border-yellow-400 transition-colors"
+                className="w-10 h-10 rounded-full border flex items-center justify-center transition-colors"
+                style={{
+                  borderColor: colors.primary.green,
+                  color: colors.primary.green,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary.green;
+                  e.currentTarget.style.color = "white";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.color = colors.primary.green;
+                }}
               >
                 <svg
-                  className="w-5 h-5 text-white"
+                  className="w-5 h-5"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -127,7 +199,9 @@ const Footer: React.FC = () => {
               </a>
             </div>
 
-            <p className="text-white text-sm">© by fpy polytechnic</p>
+            <p className="text-sm" style={{ color: colors.primary.green }}>
+              © by fpy polytechnic
+            </p>
           </div>
         </div>
       </div>
