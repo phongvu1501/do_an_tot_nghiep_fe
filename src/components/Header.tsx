@@ -55,13 +55,13 @@ const Header: React.FC = () => {
           <nav className="hidden md:block">
             <div className="flex items-center space-x-2">
               <Link
-                to="/"
+                to="/menu"
                 className="text-white hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Thực Đơn
               </Link>
               <Link
-                to=""
+                to="/"
                 className="text-white hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Giới thiệu
