@@ -1,14 +1,13 @@
-import React from "react";
-import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { message, Spin } from "antd";
+import React from "react";
+import { useForm } from "react-hook-form";
 import colors from "../../config/colors";
-import { usePopup } from "../../hooks/usePopup";
-import { useNavigate } from "react-router-dom";
-import { registerSchema } from "../../validation/auth";
-import { authService } from "../../services/auth/authServices";
-import type { RegisterData } from "../../interfaces";
 import { useAuth } from "../../hooks/useAuth";
+import { usePopup } from "../../hooks/usePopup";
+import type { RegisterData } from "../../interfaces";
+import { authService } from "../../services/auth/authServices";
+import { registerSchema } from "../../validation/auth";
 
 type RegisterFormData = RegisterData;
 
@@ -23,7 +22,6 @@ interface ApiError {
 
 const RegisterPopup: React.FC = () => {
   const { currentPopup, closePopup, switchPopup } = usePopup();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const { login } = useAuth();
@@ -52,7 +50,6 @@ const RegisterPopup: React.FC = () => {
         setTimeout(() => {
           closePopup();
           reset();
-          navigate("/");
         }, 1500);
       } else {
         if (res.errors) {
@@ -65,7 +62,6 @@ const RegisterPopup: React.FC = () => {
     } catch (err: unknown) {
       const error = err as ApiError;
 
-      // Hiển thị tất cả lỗi validation trong message
       if (error.response?.data?.errors) {
         const allErrors = Object.values(error.response.data.errors).flat();
         messageApi.error(allErrors.join(", "));

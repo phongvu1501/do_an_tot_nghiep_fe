@@ -6,4 +6,9 @@ export const authService = {
     return response.data;
   },
   
+  login: async (data) => {
+    const response = await axiosInstance.post('/login', data);
+    return response.data;
+  },
+  
 };
