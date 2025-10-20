@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import colors from "../config/colors";
+import { useAuth } from "../hooks/useAuth";
+import { usePopup } from "../hooks/usePopup";
+import LoginPopup from "./auth/LoginPopup";
 import RegisterPopup from "./auth/RegisterPopup";
 import { phone } from "./ContactSection/ContactSection";
-import LoginPopup from "./auth/LoginPopup";
-import { usePopup } from "../hooks/usePopup";
 
 const Header: React.FC = () => {
   const [openAuth, setOpenAuth] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { openPopup } = usePopup();
+  const { user } = useAuth();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -23,6 +25,8 @@ const Header: React.FC = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = () => {};
 
   return (
     <header
@@ -97,60 +101,111 @@ const Header: React.FC = () => {
                   onClick={() => setOpenAuth(!openAuth)}
                   className="flex items-center space-x-1 text-white text-sm font-medium hover:text-orange-500 transition-colors"
                 >
-                  <span>Tài khoản</span>
+                  <span>{user ? user.name : "Tài khoản"}</span>
                 </button>
 
                 {openAuth && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                    <button
-                      onClick={() => {
-                        openPopup("login");
-                        setOpenAuth(false);
-                      }}
-                      className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                    {!user ? (
+                      <>
+                        <button
+                          onClick={() => {
+                            openPopup("login");
+                            setOpenAuth(false);
+                          }}
+                          className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-                          />
-                        </svg>
-                        <span>Đăng nhập</span>
-                      </div>
-                    </button>
-                    <div className="border-t border-gray-100 my-1"></div>
-                    <button
-                      onClick={() => {
-                        openPopup("register");
-                        setOpenAuth(false);
-                      }}
-                      className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                          <div className="flex items-center space-x-2">
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                              />
+                            </svg>
+                            <span>Đăng nhập</span>
+                          </div>
+                        </button>
+                        <div className="border-t border-gray-100 my-1"></div>
+                        <button
+                          onClick={() => {
+                            openPopup("register");
+                            setOpenAuth(false);
+                          }}
+                          className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                          />
-                        </svg>
-                        <span>Đăng ký</span>
-                      </div>
-                    </button>
+                          <div className="flex items-center space-x-2">
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                              />
+                            </svg>
+                            <span>Đăng ký</span>
+                          </div>
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          to="/orders"
+                          onClick={() => setOpenAuth(false)}
+                          className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 17v-6h13M9 7h13M5 7h.01M5 17h.01"
+                              />
+                            </svg>
+                            <span>Lịch sử</span>
+                          </div>
+                        </Link>
+                        <div className="border-t border-gray-100 my-1"></div>
+                        <button
+                          onClick={handleLogout}
+                          className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                              />
+                            </svg>
+                            <span>Đăng xuất</span>
+                          </div>
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
