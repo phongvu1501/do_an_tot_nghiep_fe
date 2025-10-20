@@ -11,4 +11,9 @@ export const authService = {
     return response.data;
   },
   
+  logout: async () => {
+    const response = await axiosInstance.post('/logout');
+    return response.data;
+  },
+  
 };
