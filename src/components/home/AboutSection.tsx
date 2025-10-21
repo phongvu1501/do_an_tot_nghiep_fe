@@ -11,11 +11,11 @@ function AboutSection(): JSX.Element {
           className="w-1/3 rounded-l-2xl p-6 flex flex-col justify-start"
           style={{ backgroundColor: "#f9b233" }}
         >
-          <div className="flex items-center justify-start mb-6 flex-wrap">
+          <div className="flex items-baseline justify-start mb-2">
             <h2 className="text-xl font-bold text-black text-left">
               DATBAN QUÁN
             </h2>
-            <div className="ml-3 bg-green-600 text-white px-2 py-[2px] rounded-full text-xs font-semibold">
+            <div className="ml-3 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
               ĐANG MỞ
             </div>
           </div>
