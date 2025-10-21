@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import colors from "../../config/colors";
 import { usePopup } from "../../hooks/usePopup";
+import { useDisableScroll } from "../../hooks/useDisableScroll";
 import { useAuth } from "../../hooks/useAuth";
 import { loginSchema } from "../../validation/auth";
 import { authService } from "../../services/auth/authServices";
@@ -19,6 +20,9 @@ const LoginPopup: React.FC = () => {
   const { login: ctxLogin, setUser } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+
+  // Disable scroll when popup is open
+  useDisableScroll(currentPopup === "login");
   const {
     register,
     handleSubmit,

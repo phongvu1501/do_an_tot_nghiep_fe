@@ -1,9 +1,6 @@
 import { createContext } from "react";
 
-export type PopupType =
-  | "login"
-  | "register"
-  | null;
+export type PopupType = "login" | "register" | "order" | null;
 
 export interface PopupContextType {
   currentPopup: PopupType;

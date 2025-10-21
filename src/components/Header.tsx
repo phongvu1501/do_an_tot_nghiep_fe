@@ -5,6 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 import { usePopup } from "../hooks/usePopup";
 import LoginPopup from "./auth/LoginPopup";
 import RegisterPopup from "./auth/RegisterPopup";
+import OrderPopup from "./order/OrderPopup";
 import { phone } from "./ContactSection/ContactSection";
 import { authService } from "../services/auth/authServices";
 import { storage } from "../utils/storage";
@@ -32,14 +33,12 @@ const Header: React.FC = () => {
   }, []);
 
   const handleLogout = async () => {
-    
-      await authService.logout();
-      storage.clearAuth();
-      logout();
-      messageApi.success("Đăng xuất thành công!");
-      setOpenAuth(false);
-      navigate("/");
-   
+    await authService.logout();
+    storage.clearAuth();
+    logout();
+    messageApi.success("Đăng xuất thành công!");
+    setOpenAuth(false);
+    navigate("/");
   };
 
   return (
@@ -94,6 +93,7 @@ const Header: React.FC = () => {
                 </Link>
 
                 <button
+                  onClick={() => openPopup("order")}
                   className="px-3 py-2 rounded-md text-sm font-medium transition-colors border"
                   style={{
                     backgroundColor: colors.primary.green,
@@ -255,6 +255,7 @@ const Header: React.FC = () => {
 
         <RegisterPopup />
         <LoginPopup />
+        <OrderPopup />
       </header>
     </>
   );
