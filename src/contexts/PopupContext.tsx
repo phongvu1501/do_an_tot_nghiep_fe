@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   PopupContext,
   type PopupContextType,
   type PopupType,
 } from "./popupContext";
+import { setOpenLoginPopupCallback } from "../utils/popupTrigger";
 
 interface PopupProviderProps {
   children: ReactNode;
@@ -26,6 +27,16 @@ export const PopupProvider: React.FC<PopupProviderProps> = ({ children }) => {
       setCurrentPopup(to);
     }
   };
+
+  useEffect(() => {
+    setOpenLoginPopupCallback(() => {
+      openPopup("login");
+    });
+
+    return () => {
+      setOpenLoginPopupCallback(null);
+    };
+  }, []);
 
   const value: PopupContextType = {
     currentPopup,

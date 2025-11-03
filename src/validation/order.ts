@@ -15,7 +15,10 @@ export const orderSchema = yup.object({
         return selectedDate >= today;
       }
     ),
-  reservation_time: yup.string().required("Vui lòng chọn giờ đặt bàn"),
+  shift: yup
+    .string()
+    .required("Vui lòng chọn ca đặt bàn")
+    .oneOf(["morning", "afternoon", "evening", "night"], "Vui lòng chọn ca ăn"),
   num_people: yup
     .number()
     .typeError("Vui lòng nhập số lượng người")
@@ -25,4 +28,14 @@ export const orderSchema = yup.object({
     .integer("Số lượng người phải là số nguyên"),
   depsection: yup.string().optional().default(undefined),
   voucher_id: yup.string().nullable().optional().default(null),
+  menus: yup
+    .array()
+    .of(
+      yup.object({
+        menu_id: yup.number().required(),
+        quantity: yup.number().required().min(1),
+      })
+    )
+    .optional()
+    .default([]),
 });

@@ -6,11 +6,12 @@ import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import colors from "../../config/colors";
 import { vietnameseLocale } from "../../config/datePickerLocale";
-import { timeSlots } from "../../config/timeSlots";
+import { shifts } from "../../config/timeSlots";
 import { usePopup } from "../../hooks/usePopup";
 import { useDisableScroll } from "../../hooks/useDisableScroll";
 import { orderSchema } from "../../validation/order";
 import type { OrderFormData } from "../../interfaces/order";
+import { orderService } from "../../services/order/orderServices";
 
 dayjs.locale("vi");
 
@@ -37,7 +38,23 @@ const OrderPopup: React.FC = () => {
   const onSubmit = async (data: OrderFormData) => {
     setIsLoading(true);
     try {
-      console.log("Order data:", data);
+      const requestData: OrderFormData = {
+        reservation_date: data.reservation_date,
+        shift: data.shift,
+        num_people: data.num_people,
+        depsection: data.depsection || undefined,
+        voucher_id: data.voucher_id || null,
+        menus: data.menus || [],
+      };
+
+      if (!requestData.depsection) {
+        delete requestData.depsection;
+      }
+      if (!requestData.voucher_id) {
+        delete requestData.voucher_id;
+      }
+
+      await orderService.createReservation(requestData);
 
       messageApi.success("Đặt bàn thành công!");
 
@@ -45,8 +62,22 @@ const OrderPopup: React.FC = () => {
         closePopup();
         reset();
       }, 1500);
-    } catch {
-      messageApi.error("Có lỗi xảy ra khi đặt bàn. Vui lòng thử lại.");
+    } catch (error) {
+      const errorData = error as {
+        response?: { status?: number; data?: { message?: string } };
+      };
+
+      if (
+        errorData?.response?.status === 401 ||
+        errorData?.response?.data?.message === "Unauthenticated."
+      ) {
+        return; 
+      }
+
+      const errorMessage =
+        errorData?.response?.data?.message ||
+        "Có lỗi xảy ra khi đặt bàn. Vui lòng thử lại.";
+      messageApi.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -132,30 +163,28 @@ const OrderPopup: React.FC = () => {
 
               <div>
                 <label
-                  htmlFor="reservation_time"
+                  htmlFor="shift"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Giờ đặt bàn
+                  Ca đặt bàn
                 </label>
                 <select
-                  id="reservation_time"
-                  {...register("reservation_time")}
+                  id="shift"
+                  {...register("shift")}
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-sm ${
-                    errors.reservation_time
-                      ? "border-red-500"
-                      : "border-gray-300"
+                    errors.shift ? "border-red-500" : "border-gray-300"
                   }`}
                 >
-                  <option value="">Chọn giờ</option>
-                  {timeSlots.map((time) => (
-                    <option key={time} value={time}>
-                      {time}
+                  <option value="">Chọn ca</option>
+                  {shifts.map((shift) => (
+                    <option key={shift.value} value={shift.value}>
+                      {shift.label}
                     </option>
                   ))}
                 </select>
-                {errors.reservation_time && (
+                {errors.shift && (
                   <p className="mt-1 text-sm text-red-600">
-                    {errors.reservation_time.message}
+                    {errors.shift.message}
                   </p>
                 )}
               </div>

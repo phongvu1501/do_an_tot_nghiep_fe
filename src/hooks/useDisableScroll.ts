@@ -8,11 +8,16 @@ export const useDisableScroll = (isOpen: boolean) => {
       document.body.style.overflow = "unset";
     }
 
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 };
+
+
+
+
+
+
 
 

@@ -1,9 +1,15 @@
+export interface MenuItem {
+  menu_id: number;
+  quantity: number;
+}
+
 export interface OrderData {
   reservation_date: string;
-  reservation_time: string;
+  shift: string;
   num_people: number;
   depsection?: string;
-  voucher_id: string | null;
+  voucher_id?: string | null;
+  menus?: MenuItem[];
 }
 
 export type OrderFormData = OrderData;
