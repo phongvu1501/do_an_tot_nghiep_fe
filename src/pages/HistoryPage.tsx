@@ -1,0 +1,231 @@
+import React, { useState, useEffect } from "react";
+import { orderService } from "../services/order/orderServices";
+import type { OrderHistoryItem } from "../interfaces/order";
+import colors from "../config/colors";
+
+const HistoryPage: React.FC = () => {
+  const [orders, setOrders] = useState<OrderHistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await orderService.getHistory();
+
+        if (response.success && response.data) {
+          setOrders(response.data);
+        } else {
+          setError("Không thể tải lịch sử đặt bàn");
+        }
+      } catch (err) {
+        console.error("Error fetching history:", err);
+        setError("Có lỗi xảy ra khi tải lịch sử đặt bàn");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const getStatusBadgeColor = (status: string) => {
+    const statusConfig: Record<string, string> = {
+      pending: "#f59e0b",
+      confirmed: "#10b981",
+      cancelled: "#ef4444",
+      completed: "#6366f1",
+      deposit_paid: "#3b82f6",
+      deposit_pending: "#f97316",
+    };
+
+    return statusConfig[status.toLowerCase()] || "#6b7280";
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center py-12">
+        <div className="text-center">
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+            style={{ borderColor: colors.primary.green }}
+          ></div>
+          <p className="text-gray-600">Đang tải lịch sử...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center py-12">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            style={{
+              backgroundColor: colors.primary.green,
+              color: "white",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.primary.yellow;
+              e.currentTarget.style.color = colors.primary.green;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.primary.green;
+              e.currentTarget.style.color = "white";
+            }}
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen py-8">
+      <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        {orders.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="mb-4">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+            <p className="text-gray-600 text-lg">Chưa có đặt bàn nào</p>
+            <p className="text-gray-500 text-sm mt-2">
+              Bạn chưa có lịch sử đặt bàn tại nhà hàng
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {orders.map((order) => (
+              <div
+                key={order.id}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              >
+                <div className="p-6 space-y-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <h3
+                        className="text-xl font-bold"
+                        style={{ color: colors.primary.green }}
+                      >
+                        Mã đơn đặt bàn:{" "}
+                        {order.reservation_code || `#${order.id}`}
+                      </h3>
+                      <span
+                        className="px-3 py-1 rounded-full text-xs font-semibold text-white"
+                        style={{
+                          backgroundColor: getStatusBadgeColor(order.status),
+                        }}
+                      >
+                        {order.status_text}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Đặt lúc: {order.created_at}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2">
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <span>
+                        <strong>Ngày:</strong>{" "}
+                        {formatDate(order.reservation_date)}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>
+                        <strong>Ca:</strong> {order.shift_info.name} (
+                        {order.shift_info.time})
+                      </span>
+                    </div>
+                  </div>
+
+                  {order.status === "deposit_pending" && order.payment_url && (
+                    <div className="pt-4 border-t border-gray-200">
+                      <a
+                        href={order.payment_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-semibold transition-colors"
+                        style={{
+                          backgroundColor: colors.primary.yellow,
+                          color: colors.primary.green,
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            colors.primary.green;
+                          e.currentTarget.style.color = "white";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor =
+                            colors.primary.yellow;
+                          e.currentTarget.style.color = colors.primary.green;
+                        }}
+                      >
+                        Thanh toán tiền cọc
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default HistoryPage;

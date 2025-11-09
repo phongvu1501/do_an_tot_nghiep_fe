@@ -13,3 +13,47 @@ export interface OrderData {
 }
 
 export type OrderFormData = OrderData;
+
+export interface OrderHistoryMenuItem {
+  id: number;
+  name: string;
+  quantity: number;
+  price: number;
+  total: number;
+}
+
+export interface OrderHistoryTable {
+  id: number;
+  name: string;
+}
+
+export interface ShiftInfo {
+  id: number;
+  name: string;
+  time: string;
+}
+
+export interface OrderHistoryItem {
+  id: number;
+  status: string;
+  status_text: string;
+  reservation_code?: string;
+  reservation_date: string;
+  num_people: number;
+  depsection?: string | null;
+  tables: OrderHistoryTable[];
+  tables_count: number;
+  shift_info: ShiftInfo;
+  voucher_code?: string | null;
+  total_price: number;
+  created_at: string;
+  menus?: OrderHistoryMenuItem[];
+  payment_url?: string | null;
+}
+
+export interface Pagination {
+  total: number;
+  per_page: number;
+  current_page: number;
+  last_page: number;
+}

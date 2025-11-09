@@ -5,6 +5,10 @@ export const orderService = {
     const response = await axiosInstance.post('/dat-ban-an', data);
     return response.data;
   },
+  getHistory: async () => {
+    const response = await axiosInstance.get('/dat-ban-an/history');
+    return response.data;
+  },
 };
 
 

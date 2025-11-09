@@ -19,6 +19,12 @@ const MainLayout: React.FC = () => {
           description:
             "Thăng hoa vị giác với 100+ món ăn đặc sắc, hải sản, món hấp được chuẩn bị từ những đầu bếp chuyên nghiệp hàng đầu.",
         };
+      case "/history-orders":
+        return {
+          title: "Lịch sử đặt bàn",
+          description:
+            "Xem lại tất cả các đặt bàn của bạn tại nhà hàng",
+        };
       default:
         return {
           title: "Trang chủ",
@@ -36,7 +42,7 @@ const MainLayout: React.FC = () => {
       </main>
       <Footer />
       <ScrollToTop />
-      <FloatingContact/>
+      <FloatingContact />
     </div>
   );
 };

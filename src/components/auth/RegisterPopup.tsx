@@ -47,10 +47,8 @@ const RegisterPopup: React.FC = () => {
         login(res.data.token, res.data.user);
         messageApi.success(res.message || "Đăng ký thành công!");
 
-        setTimeout(() => {
-          closePopup();
-          reset();
-        }, 1500);
+        closePopup();
+        reset();
       } else {
         if (res.errors) {
           const allErrors = Object.values(res.errors).flat();

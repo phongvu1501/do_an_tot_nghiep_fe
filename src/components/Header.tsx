@@ -179,7 +179,7 @@ const Header: React.FC = () => {
                       ) : (
                         <>
                           <Link
-                            to="/orders"
+                            to="/history-orders"
                             onClick={() => setOpenAuth(false)}
                             className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
                           >
@@ -197,7 +197,7 @@ const Header: React.FC = () => {
                                   d="M9 17v-6h13M9 7h13M5 7h.01M5 17h.01"
                                 />
                               </svg>
-                              <span>Lịch sử</span>
+                              <span>Lịch sử đặt bàn</span>
                             </div>
                           </Link>
                           <div className="border-t border-gray-100 my-1"></div>
