@@ -15,4 +15,5 @@ export interface ApiResponse<T> {
 export const orderService: {
   createReservation: (data: OrderData) => Promise<ApiResponse<unknown>>;
   getHistory: () => Promise<ApiResponse<OrderHistoryItem[]>>;
+  getReservationDetail: (id: number) => Promise<ApiResponse<OrderHistoryItem>>;
 };

@@ -9,6 +9,10 @@ export const orderService = {
     const response = await axiosInstance.get('/dat-ban-an/history');
     return response.data;
   },
+  getReservationDetail: async (id) => {
+    const response = await axiosInstance.get(`/dat-ban-an/${id}`);
+    return response.data;
+  },
 };
 
 

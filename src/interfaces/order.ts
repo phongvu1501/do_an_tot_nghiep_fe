@@ -45,6 +45,7 @@ export interface OrderHistoryItem {
   tables_count: number;
   shift_info: ShiftInfo;
   voucher_code?: string | null;
+  cancellation_reason?: string | null;
   total_price: number;
   created_at: string;
   menus?: OrderHistoryMenuItem[];
