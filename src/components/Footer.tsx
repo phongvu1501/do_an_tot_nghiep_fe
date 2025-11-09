@@ -50,7 +50,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="#"
+                  href="/menu"
                   className="transition-colors"
                   style={{ color: colors.primary.green }}
                 >
@@ -59,7 +59,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/about"
                   className="transition-colors"
                   style={{ color: colors.primary.green }}
                 >

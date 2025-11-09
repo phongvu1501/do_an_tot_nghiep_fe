@@ -10,6 +10,15 @@ import BannerMain from "../components/BannerMain";
 const MainLayout: React.FC = () => {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const hiddenBannerRoutes = new Set<string>(["/about"]);
+
+  React.useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  }, [location.pathname]);
 
   const getBannerConfig = () => {
     switch (location.pathname) {
@@ -22,8 +31,13 @@ const MainLayout: React.FC = () => {
       case "/history-orders":
         return {
           title: "Lịch sử đặt bàn",
+          description: "Xem lại tất cả các đơn đặt bàn của bạn tại nhà hàng",
+        };
+      case "/about":
+        return {
+          title: "Giới thiệu",
           description:
-            "Xem lại tất cả các đặt bàn của bạn tại nhà hàng",
+            "Khám phá hành trình phát triển và dịch vụ của DATBAN Quán.",
         };
       default:
         return {
@@ -36,7 +50,11 @@ const MainLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      {isHomePage ? <BannerHome /> : <BannerMain {...getBannerConfig()} />}
+      {isHomePage ? (
+        <BannerHome />
+      ) : hiddenBannerRoutes.has(location.pathname) ? null : (
+        <BannerMain {...getBannerConfig()} />
+      )}
       <main className="flex-1">
         <Outlet />
       </main>

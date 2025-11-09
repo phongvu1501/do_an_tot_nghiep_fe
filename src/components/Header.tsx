@@ -80,7 +80,7 @@ const Header: React.FC = () => {
                   Thực Đơn
                 </Link>
                 <Link
-                  to="/"
+                  to="/about"
                   className="text-white hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Giới thiệu

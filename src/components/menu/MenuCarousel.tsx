@@ -138,25 +138,28 @@ const MenuCarousel: React.FC<MenuCarouselProps> = ({ foodItems, title }) => {
         ))}
       </div>
 
-      <div className="text-center mt-12">
-        <button
-          className="border-2 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors duration-300 hover:text-white"
-          style={{
-            backgroundColor: colors.primary.green,
-            borderColor: colors.primary.yellow,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = colors.primary.yellow;
-            e.currentTarget.style.color = colors.primary.green;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = colors.primary.green;
-            e.currentTarget.style.color = "white";
-          }}
-        >
-          XEM THỰC ĐƠN
-        </button>
-      </div>
+      <a href="/menu">
+        <div className="text-center mt-12">
+          <button
+            className="border-2 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors duration-300 hover:text-white"
+            style={{
+              backgroundColor: colors.primary.green,
+              borderColor: colors.primary.yellow,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.primary.yellow;
+              e.currentTarget.style.color = colors.primary.green;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.primary.green;
+              e.currentTarget.style.color = "white";
+            }}
+          >
+            XEM THỰC ĐƠN
+          </button>
+          
+        </div>
+      </a>
     </div>
   );
 };

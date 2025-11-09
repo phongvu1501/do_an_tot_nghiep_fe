@@ -1,5 +1,4 @@
 import React from "react";
-import { FaSearch } from "react-icons/fa";
 import colors from "../config/colors";
 
 interface BannerMainProps {
@@ -28,19 +27,6 @@ const BannerMain: React.FC<BannerMainProps> = ({ title, description }) => {
               <p className="text-gray-200 text-base md:text-lg leading-relaxed">
                 {description}
               </p>
-            </div>
-
-            <div className="hidden md:block flex-shrink-0 ml-8">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm món ăn..."
-                  className="w-72 h-10 px-4 pr-12 bg-white/15 backdrop-blur-sm border border-white/30 rounded-xl 
-                 text-gray-100 placeholder-gray-400 focus:outline-none 
-                 focus:border-white/50 focus:bg-white/20 transition-all duration-300 shadow-sm"
-                />
-                <FaSearch className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-200 w-5 h-5" />
-              </div>
             </div>
           </div>
         </div>
