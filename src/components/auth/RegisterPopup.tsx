@@ -3,7 +3,6 @@ import { message, Spin } from "antd";
 import React from "react";
 import { useForm } from "react-hook-form";
 import colors from "../../config/colors";
-import { useAuth } from "../../hooks/useAuth";
 import { usePopup } from "../../hooks/usePopup";
 import type { RegisterData } from "../../interfaces";
 import { authService } from "../../services/auth/authServices";
@@ -21,10 +20,9 @@ interface ApiError {
 }
 
 const RegisterPopup: React.FC = () => {
-  const { currentPopup, closePopup, switchPopup } = usePopup();
+  const { currentPopup, closePopup, switchPopup, openPopup } = usePopup();
   const [isLoading, setIsLoading] = React.useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-  const { login } = useAuth();
 
   const {
     register,
@@ -43,12 +41,14 @@ const RegisterPopup: React.FC = () => {
     try {
       const res = await authService.register(data);
 
-      if (res.success && res.data) {
-        login(res.data.token, res.data.user);
+      if (res.success) {
         messageApi.success(res.message || "Đăng ký thành công!");
-
         closePopup();
         reset();
+
+        setTimeout(() => {
+          openPopup("login");
+        }, 500);
       } else {
         if (res.errors) {
           const allErrors = Object.values(res.errors).flat();

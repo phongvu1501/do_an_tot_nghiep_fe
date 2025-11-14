@@ -29,6 +29,15 @@ axiosInstance.interceptors.response.use(
   (error) => {
     const { response } = error;
 
+    if (response?.data?.message) {
+      if (
+        response.data.message === "Unauthenticated" ||
+        response.data.message.toLowerCase().includes("unauthenticated")
+      ) {
+        response.data.message = "Vui lòng đăng nhập lại";
+      }
+    }
+
     if (response?.status === 401) {
       storage.clearAuth();
 

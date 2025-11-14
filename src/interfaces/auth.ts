@@ -15,6 +15,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  phone?: string;
   role: string;
   created_at: string;
   updated_at: string;
@@ -32,4 +33,11 @@ export interface AuthResponse {
   token: string;
   token_type: string;
   expires_in: string;
+}
+
+// Interface cho response đăng ký - hỗ trợ cả 2 format:
+// 1. Format có token: { success, message, data: { token, user } }
+// 2. Format không có token: { success, message, user } (user ở root level)
+export interface RegisterResponse extends ApiResponse<AuthResponse> {
+  user?: User; // User có thể ở root level khi không có token
 }
