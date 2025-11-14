@@ -10,6 +10,7 @@ import "./App.css";
 import MainLayout from "./layouts/MainLayout";
 import { PopupProvider } from "./contexts/PopupContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { MessageProvider } from "./contexts/MessageProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,21 +24,23 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <PopupProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<MainLayout />}>
-                <Route index element={<HomePage />} />
-                <Route path="about" element={<AboutPage />} />
-                <Route path="menu" element={<MenuPage />} />
-                <Route path="history-orders" element={<HistoryPage />} />
-              </Route>
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Router>
-        </PopupProvider>
-      </AuthProvider>
+      <MessageProvider>
+        <AuthProvider>
+          <PopupProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<MainLayout />}>
+                  <Route index element={<HomePage />} />
+                  <Route path="about" element={<AboutPage />} />
+                  <Route path="menu" element={<MenuPage />} />
+                  <Route path="history-orders" element={<HistoryPage />} />
+                </Route>
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Router>
+          </PopupProvider>
+        </AuthProvider>
+      </MessageProvider>
     </QueryClientProvider>
   );
 }

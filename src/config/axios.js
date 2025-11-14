@@ -1,6 +1,7 @@
 import axios from "axios";
 import { triggerLoginPopup } from "../utils/popupTrigger";
 import { storage } from "../utils/storage";
+import { showMessage } from "../utils/messageService";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
@@ -29,25 +30,48 @@ axiosInstance.interceptors.response.use(
   (error) => {
     const { response } = error;
 
-    if (response?.data?.message) {
-      if (
-        response.data.message === "Unauthenticated" ||
-        response.data.message.toLowerCase().includes("unauthenticated")
-      ) {
-        response.data.message = "Vui lòng đăng nhập lại";
-      }
-    }
-
     if (response?.status === 401) {
+      // Xác định message hiển thị
+      let messageToShow = "Vui lòng đăng nhập lại";
+      
+      if (response?.data?.message) {
+        if (
+          response.data.message === "Unauthenticated" ||
+          response.data.message.toLowerCase().includes("unauthenticated")
+        ) {
+          messageToShow = "Vui lòng đăng nhập lại";
+        } else {
+          messageToShow = response.data.message;
+        }
+      }
+      
+      // Cập nhật message trong response để các component có thể sử dụng
+      if (!response.data) {
+        response.data = {};
+      }
+      response.data.message = messageToShow;
+
+      // Xóa auth từ storage
       storage.clearAuth();
 
+      // Kiểm tra endpoint type
       const requestUrl = response.config?.url ?? "";
+      const isLogoutEndpoint = requestUrl.includes("/logout");
       const isAuthEndpoint =
         requestUrl.includes("/login") || requestUrl.includes("/register");
+      const skipLoginPopup = response.config?.skipLoginPopup === true;
 
-      if (!isAuthEndpoint) {
+      // Không mở popup login và không hiển thị message nếu:
+      // 1. Là endpoint logout
+      // 2. Là endpoint auth (login/register)
+      // 3. Hoặc có flag skipLoginPopup
+      if (!isLogoutEndpoint && !isAuthEndpoint && !skipLoginPopup) {
+        // Hiển thị thông báo "Vui lòng đăng nhập lại"
+        showMessage.error(messageToShow);
+        // Mở popup login
         triggerLoginPopup();
       }
+      // Nếu là logout endpoint hoặc auth endpoint, không hiển thị message và không mở popup
     }
     return Promise.reject(error);
   }

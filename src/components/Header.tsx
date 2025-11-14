@@ -33,12 +33,19 @@ const Header: React.FC = () => {
   }, []);
 
   const handleLogout = async () => {
-    await authService.logout();
-    storage.clearAuth();
-    logout();
-    messageApi.success("Đăng xuất thành công!");
-    setOpenAuth(false);
-    navigate("/");
+    try {
+      // Gọi API logout, nhưng không quan tâm kết quả
+      await authService.logout();
+    } catch (error) {
+      // Bỏ qua lỗi, vẫn tiếp tục logout ở client
+    } finally {
+      // Luôn xóa localStorage và đăng xuất ở client, dù API thành công hay thất bại
+      storage.clearAuth();
+      logout();
+      messageApi.success("Đăng xuất thành công!");
+      setOpenAuth(false);
+      navigate("/");
+    }
   };
 
   return (
