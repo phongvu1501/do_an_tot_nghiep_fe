@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import MenuPage from "./pages/MenuPage";
 import HistoryPage from "./pages/HistoryPage";
 import AboutPage from "./pages/AboutPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import "./App.css";
 import MainLayout from "./layouts/MainLayout";
 import { PopupProvider } from "./contexts/PopupContext";
@@ -32,6 +33,7 @@ function App() {
                 <Route path="menu" element={<MenuPage />} />
                 <Route path="history-orders" element={<HistoryPage />} />
               </Route>
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Router>
         </PopupProvider>
