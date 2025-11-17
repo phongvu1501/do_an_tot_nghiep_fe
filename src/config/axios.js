@@ -2,6 +2,7 @@ import axios from "axios";
 import { triggerLoginPopup } from "../utils/popupTrigger";
 import { storage } from "../utils/storage";
 import { showMessage } from "../utils/messageService";
+import { triggerLogout } from "../utils/logoutTrigger";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
@@ -53,6 +54,9 @@ axiosInstance.interceptors.response.use(
 
       // Xóa auth từ storage
       storage.clearAuth();
+      
+      // Cập nhật state trong AuthContext (gọi logout để clear state)
+      triggerLogout();
 
       // Kiểm tra endpoint type
       const requestUrl = response.config?.url ?? "";

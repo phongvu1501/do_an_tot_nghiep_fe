@@ -5,6 +5,7 @@ import {
   type AuthContextValue,
   type AuthUser,
 } from "./authContextBase";
+import { setLogoutCallback } from "../utils/logoutTrigger";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -31,6 +32,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setToken(null);
     setUser(null);
   }, []);
+
+  useEffect(() => {
+    setLogoutCallback(logout);
+
+    return () => {
+      setLogoutCallback(null);
+    };
+  }, [logout]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
