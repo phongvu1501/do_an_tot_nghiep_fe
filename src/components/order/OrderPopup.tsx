@@ -11,6 +11,7 @@ import { usePopup } from "../../hooks/usePopup";
 import { orderSchema } from "../../validation/order";
 import type { OrderFormData } from "../../interfaces/order";
 import { orderService } from "../../services/order/orderServices";
+import { storage } from "../../utils/storage";
 
 type CreateReservationResponse = {
   success?: boolean;
@@ -30,6 +31,7 @@ const ReservationPopup: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [paymentModalVisible, setPaymentModalVisible] = React.useState(false);
   const [paymentUrl, setPaymentUrl] = React.useState<string | null>(null);
+  const [menuCart, setMenuCart] = React.useState(storage.getMenuCart());
 
   const {
     register,
@@ -50,20 +52,54 @@ const ReservationPopup: React.FC = () => {
 
   const isOrderPopupOpen = currentPopup === "order";
 
+  React.useEffect(() => {
+    if (isOrderPopupOpen) {
+      setMenuCart(storage.getMenuCart());
+    }
+  }, [isOrderPopupOpen]);
+
+  const handleRemoveMenu = (menuId: number) => {
+    storage.removeMenuFromCart(menuId);
+    setMenuCart(storage.getMenuCart());
+    messageApi.success("Đã xóa món khỏi giỏ hàng");
+  };
+
+  const handleUpdateQuantity = (menuId: number, quantity: number) => {
+    if (quantity <= 0) {
+      handleRemoveMenu(menuId);
+      return;
+    }
+    storage.updateMenuQuantity(menuId, quantity);
+    setMenuCart(storage.getMenuCart());
+  };
+
   const onSubmit = async (data: OrderFormData) => {
     setIsLoading(true);
     try {
+      // Convert menu cart to the format expected by API
+      const menus = menuCart.map((item) => ({
+        menu_id: item.menu_id,
+        quantity: item.quantity,
+      }));
+
+      const orderData: OrderFormData = {
+        ...data,
+        menus: menus.length > 0 ? menus : undefined,
+      };
+
       const response = (await orderService.createReservation(
-        data
+        orderData
       )) as CreateReservationResponse;
 
       if (response?.success) {
         const paymentUrl =
           response.data?.payment_url || response.payment_url || null;
 
-        messageApi.success(
-          "Đặt bàn thành công! Chúng tôi sẽ liên hệ lại để xác nhận."
-        );
+        messageApi.success("Đặt bàn thành công!");
+
+        // Clear menu cart after successful order
+        storage.clearMenuCart();
+        setMenuCart([]);
 
         if (paymentUrl) {
           setPaymentUrl(paymentUrl);
@@ -287,7 +323,7 @@ const ReservationPopup: React.FC = () => {
                   )}
                 </div>
 
-                <div>
+                {/* <div>
                   <label
                     htmlFor="voucher_id"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -301,7 +337,83 @@ const ReservationPopup: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     placeholder="Nhập mã voucher nếu có"
                   />
-                </div>
+                </div> */}
+
+                {menuCart.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Món ăn đã chọn ({menuCart.length})
+                    </label>
+                    <div className="border border-gray-300 rounded-md max-h-48 overflow-y-auto">
+                      {menuCart.map((item) => (
+                        <div
+                          key={item.menu_id}
+                          className="flex items-center justify-between p-3 border-b border-gray-200 last:border-b-0"
+                        >
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-800">
+                              {item.name || `Món #${item.menu_id}`}
+                            </p>
+                            {item.price && (
+                              <p className="text-xs text-gray-500">
+                                {parseFloat(item.price).toLocaleString("vi-VN")}
+                                đ
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateQuantity(
+                                  item.menu_id,
+                                  item.quantity - 1
+                                )
+                              }
+                              className="w-6 h-6 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 transition-colors"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium w-8 text-center">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateQuantity(
+                                  item.menu_id,
+                                  item.quantity + 1
+                                )
+                              }
+                              className="w-6 h-6 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 transition-colors"
+                            >
+                              +
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveMenu(item.menu_id)}
+                              className="ml-2 text-red-500 hover:text-red-700 transition-colors"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <label

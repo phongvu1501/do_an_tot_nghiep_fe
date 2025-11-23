@@ -34,12 +34,10 @@ const Header: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      // Gọi API logout, nhưng không quan tâm kết quả
       await authService.logout();
     } catch (error) {
       // Bỏ qua lỗi, vẫn tiếp tục logout ở client
     } finally {
-      // Luôn xóa localStorage và đăng xuất ở client, dù API thành công hay thất bại
       storage.clearAuth();
       logout();
       messageApi.success("Đăng xuất thành công!");
@@ -92,12 +90,12 @@ const Header: React.FC = () => {
                 >
                   Giới thiệu
                 </Link>
-                <Link
+                {/* <Link
                   to=""
                   className="text-white hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Liên Hệ
-                </Link>
+                </Link> */}
 
                 <button
                   onClick={() => openPopup("order")}
