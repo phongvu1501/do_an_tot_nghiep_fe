@@ -10,7 +10,7 @@ export const registerSchema = yup.object({
     .string()
     .required("Số điện thoại là bắt buộc")
     .matches(/^[0-9]{10,11}$/, "Số điện thoại phải có 10-11 chữ số"),
-  email: yup.string().required("Email là bắt buộc").email("Email không hợp lệ"),
+  email: yup.string().optional().email("Email không hợp lệ"),
   password: yup
     .string()
     .required("Mật khẩu là bắt buộc")
@@ -23,6 +23,9 @@ export const registerSchema = yup.object({
 });
 
 export const loginSchema = yup.object({
-  email: yup.string().required("Email là bắt buộc").email("Email không hợp lệ"),
+  phone: yup
+    .string()
+    .required("Số điện thoại là bắt buộc")
+    .matches(/^[0-9]{10,11}$/, "Số điện thoại phải có 10-11 chữ số"),
   password: yup.string().required("Mật khẩu là bắt buộc"),
 });

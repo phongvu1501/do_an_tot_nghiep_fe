@@ -1,13 +1,13 @@
 export interface RegisterData {
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   password: string;
   password_confirmation: string;
 }
 
 export interface LoginData {
-  email: string;
+  phone: string;
   password: string;
 }
 

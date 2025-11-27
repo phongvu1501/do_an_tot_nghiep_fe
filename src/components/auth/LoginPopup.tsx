@@ -11,7 +11,7 @@ import { storage } from "../../utils/storage";
 import { message, Spin } from "antd";
 
 interface LoginFormData {
-  email: string;
+  phone: string;
   password: string;
 }
 
@@ -111,23 +111,23 @@ const LoginPopup: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
                 <label
-                  htmlFor="email"
+                  htmlFor="phone"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Email
+                  Số điện thoại
                 </label>
                 <input
-                  type="email"
-                  id="email"
-                  {...register("email")}
+                  type="tel"
+                  id="phone"
+                  {...register("phone")}
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                    errors.email ? "border-red-500" : "border-gray-300"
+                    errors.phone ? "border-red-500" : "border-gray-300"
                   }`}
-                  placeholder="Nhập địa chỉ email"
+                  placeholder="Nhập số điện thoại"
                 />
-                {errors.email && (
+                {errors.phone && (
                   <p className="mt-1 text-sm text-red-600">
-                    {errors.email.message}
+                    {errors.phone.message}
                   </p>
                 )}
               </div>

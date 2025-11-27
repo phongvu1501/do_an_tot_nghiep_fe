@@ -11,15 +11,18 @@
 
 ### Các bước cài đặt
 
- **Clone repository**
+**Clone repository**
 
 **Cài đặt dependencies**
-   npm install
- **Chạy development server**
-   npm run dev
-# Lint code
-   npm run lint
+npm install
+**Chạy development server**
+npm run dev
 
-##  Cấu hình
+# Lint code
+
+npm run lint
+
+## Cấu hình
+
 Tạo file `.env` trong thư mục gốc:
 VITE_API_BASE_URL=http://127.0.0.1:8000/api
