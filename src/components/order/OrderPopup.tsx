@@ -37,11 +37,15 @@ const ReservationPopup: React.FC = () => {
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors },
     reset,
   } = useForm<OrderFormData>({
     resolver: yupResolver(orderSchema),
   });
+
+  const preferVip = watch("prefer_vip") ?? false;
+  const maxPeople = preferVip ? 40 : 20;
 
   const resetAndClose = () => {
     reset();
@@ -85,6 +89,7 @@ const ReservationPopup: React.FC = () => {
       const orderData: OrderFormData = {
         ...data,
         menus: menus.length > 0 ? menus : undefined,
+        prefer_vip: data.prefer_vip ?? false,
       };
 
       const response = (await orderService.createReservation(
@@ -253,6 +258,67 @@ const ReservationPopup: React.FC = () => {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Loại phòng
+                  </label>
+                  <Controller
+                    name="prefer_vip"
+                    control={control}
+                    defaultValue={false}
+                    render={({ field }) => (
+                      <button
+                        type="button"
+                        onClick={() => field.onChange(!field.value)}
+                        className={`w-full py-3 px-4 border-2 rounded-md transition-all duration-200 flex items-center justify-center space-x-2 ${
+                          field.value
+                            ? "border-yellow-500 bg-yellow-50"
+                            : "border-gray-300 bg-white hover:border-gray-400"
+                        }`}
+                      >
+                        <div
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                            field.value
+                              ? "border-yellow-500 bg-yellow-500"
+                              : "border-gray-400 bg-white"
+                          }`}
+                        >
+                          {field.value && (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={3}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span
+                          className={`font-semibold ${
+                            field.value ? "text-yellow-700" : "text-gray-700"
+                          }`}
+                        >
+                          Phòng VIP
+                        </span>
+                        {field.value && (
+                          <span className="text-xs text-yellow-600">
+                            (Đã chọn)
+                          </span>
+                        )}
+                      </button>
+                    )}
+                  />
+                  <p className="mt-1 text-xs text-gray-500 text-center">
+                    Phòng VIP ~ 30 người
+                  </p>
+                </div>
+
+                <div>
                   <label
                     htmlFor="num_people"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -263,13 +329,13 @@ const ReservationPopup: React.FC = () => {
                     type="number"
                     id="num_people"
                     min="1"
-                    max="20"
+                    max={maxPeople}
                     step="1"
                     {...register("num_people", {
                       valueAsNumber: true,
                       setValueAs: (value) => {
                         const num = parseInt(value);
-                        if (isNaN(num) || num < 1 || num > 20) {
+                        if (isNaN(num) || num < 1 || num > maxPeople) {
                           return undefined;
                         }
                         return num;
@@ -293,7 +359,7 @@ const ReservationPopup: React.FC = () => {
                         const currentValue = e.currentTarget.value;
                         const newValue = currentValue + e.key;
                         const num = parseInt(newValue);
-                        if (num > 20) {
+                        if (num > maxPeople) {
                           e.preventDefault();
                         }
                       }
@@ -305,8 +371,8 @@ const ReservationPopup: React.FC = () => {
                       value = value.replace(/[^0-9]/g, "");
 
                       const num = parseInt(value);
-                      if (num > 20) {
-                        value = "20";
+                      if (num > maxPeople) {
+                        value = maxPeople.toString();
                       }
 
                       target.value = value;
@@ -314,7 +380,7 @@ const ReservationPopup: React.FC = () => {
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
                       errors.num_people ? "border-red-500" : "border-gray-300"
                     }`}
-                    placeholder="Nhập số lượng người (1-20)"
+                    placeholder={`Nhập số lượng người`}
                   />
                   {errors.num_people && (
                     <p className="mt-1 text-sm text-red-600">

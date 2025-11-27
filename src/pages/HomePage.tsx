@@ -4,78 +4,8 @@ import MoveAdvertising from "../components/home/MoveAdvertising";
 import PromotionSection from "../components/home/PromotionSection";
 import MenuCarousel from "../components/menu/MenuCarousel";
 import colors from "../config/colors";
-const foodItems = [
-  {
-    id: 1,
-    name: "Gỏi chân gà trộn thính",
-    price: 150000,
-    image:
-      "https://storage.quannhautudo.com/data/thumb_400/Data/images/product/2025/06/202506271714549081.webp",
-  },
-  {
-    id: 2,
-    name: "Gỏi chân gà trộn thính",
-    price: 150000,
-    image:
-      "https://storage.quannhautudo.com/data/thumb_400/Data/images/product/2025/06/202506271714549081.webp",
-  },
-  {
-    id: 3,
-    name: "Gỏi chân gà trộn thính",
-    price: 150000,
-    image:
-      "https://storage.quannhautudo.com/data/thumb_400/Data/images/product/2025/06/202506271714549081.webp",
-  },
-  {
-    id: 4,
-    name: "Gỏi chân gà trộn thính",
-    price: 150000,
-    image:
-      "https://storage.quannhautudo.com/data/thumb_400/Data/images/product/2025/06/202506271714549081.webp",
-  },
-  {
-    id: 5,
-    name: "Lợn mán nướng giềng mẻ",
-    price: 150000,
-    image:
-      "https://storage.quannhautudo.com/data/thumb_400/Data/images/product/2025/06/202506271704483259.webp ",
-  },
-  {
-    id: 6,
-    name: "Lợn mán nướng giềng mẻ",
-    price: 150000,
-    image:
-      "https://storage.quannhautudo.com/data/thumb_400/Data/images/product/2025/06/202506271704483259.webp ",
-  },
-  {
-    id: 7,
-    name: "Lợn mán nướng giềng mẻ",
-    price: 150000,
-    image:
-      "https://storage.quannhautudo.com/data/thumb_400/Data/images/product/2025/06/202506271704483259.webp ",
-  },
-  {
-    id: 8,
-    name: "Lợn mán nướng giềng mẻ",
-    price: 150000,
-    image:
-      "https://storage.quannhautudo.com/data/thumb_400/Data/images/product/2025/06/202506271704483259.webp ",
-  },
-  {
-    id: 9,
-    name: "Gỏi chân gà trộn thính",
-    price: 150000,
-    image:
-      "https://storage.quannhautudo.com/data/thumb_400/Data/images/product/2025/06/202506271714549081.webp",
-  },
-  {
-    id: 10,
-    name: "Gỏi chân gà trộn thính",
-    price: 150000,
-    image:
-      "https://storage.quannhautudo.com/data/thumb_400/Data/images/product/2025/06/202506271714549081.webp",
-  },
-];
+import { menuService } from "../services/menu/menuServices";
+import type { MenuCategory, MenuItem } from "../services/menu/menuServices";
 
 const AnimatedText: React.FC<{ text: string; isVisible: boolean }> = ({
   text,
@@ -100,6 +30,8 @@ const AnimatedText: React.FC<{ text: string; isVisible: boolean }> = ({
 const HomePage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [comboItems, setComboItems] = useState<MenuItem[]>([]);
+  const [loadingCombo, setLoadingCombo] = useState(true);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -116,6 +48,39 @@ const HomePage: React.FC = () => {
     }
 
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const fetchComboItems = async () => {
+      try {
+        setLoadingCombo(true);
+        // Lấy danh sách categories
+        const categoriesResponse = await menuService.getMenuCategories();
+
+        if (categoriesResponse.status === "success") {
+          // Tìm category có tên là "combo" (không phân biệt hoa thường)
+          const comboCategory = categoriesResponse.data.find(
+            (cat: MenuCategory) => cat.name.toLowerCase() === "combo"
+          );
+
+          if (comboCategory) {
+            // Lấy món ăn của category combo
+            const itemsResponse = await menuService.getMenuItems(
+              comboCategory.id
+            );
+            if (itemsResponse.status === "success") {
+              setComboItems(itemsResponse.data);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching combo items:", err);
+      } finally {
+        setLoadingCombo(false);
+      }
+    };
+
+    fetchComboItems();
   }, []);
 
   return (
@@ -142,7 +107,25 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="mt-16">
-            <MenuCarousel foodItems={foodItems} title="Món ăn mới" />
+            {loadingCombo ? (
+              <div className="flex justify-center items-center py-8">
+                <div
+                  className="animate-spin rounded-full h-8 w-8 border-b-2"
+                  style={{ borderColor: colors.primary.yellow }}
+                ></div>
+                <span className="ml-2 text-white">Đang tải combo...</span>
+              </div>
+            ) : comboItems.length > 0 ? (
+              <MenuCarousel
+                foodItems={comboItems.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                  price: parseFloat(item.price),
+                  image: item.image_url,
+                }))}
+                title="Combo hấp dẫn"
+              />
+            ) : null}
           </div>
 
           <div className="mt-16">
@@ -151,7 +134,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
       <PromotionSection />
-      <MoveAdvertising/>
+      <MoveAdvertising />
     </>
   );
 };

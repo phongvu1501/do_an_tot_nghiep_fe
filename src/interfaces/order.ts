@@ -10,6 +10,7 @@ export interface OrderData {
   depsection?: string;
   voucher_id?: string | null;
   menus?: MenuItem[];
+  prefer_vip?: boolean;
 }
 
 export type OrderFormData = OrderData;

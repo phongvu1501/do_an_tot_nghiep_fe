@@ -35,8 +35,8 @@ const Header: React.FC = () => {
   const handleLogout = async () => {
     try {
       await authService.logout();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
     } catch (error) {
-      // Bỏ qua lỗi, vẫn tiếp tục logout ở client
     } finally {
       storage.clearAuth();
       logout();

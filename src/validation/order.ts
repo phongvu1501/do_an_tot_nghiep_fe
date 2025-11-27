@@ -29,7 +29,22 @@ export const orderSchema: yup.ObjectSchema<OrderFormData> = yup
       .typeError("Vui lòng nhập số lượng người")
       .required("Vui lòng nhập số lượng người")
       .min(1, "Số lượng người phải ít nhất 1 người")
-      .max(20, "Số lượng người không được vượt quá 20 người")
+      .test(
+        "max-people",
+        "Số lượng người không được vượt quá giới hạn",
+        function (value) {
+          const preferVip = this.parent.prefer_vip;
+          const maxPeople = preferVip ? 50 : 20;
+          if (value && value > maxPeople) {
+            return this.createError({
+              message: preferVip
+                ? "Số lượng người không được vượt quá 50 người (bàn VIP)"
+                : "Số lượng người không được vượt quá 20 người (bàn thường)",
+            });
+          }
+          return true;
+        }
+      )
       .integer("Số lượng người phải là số nguyên"),
     depsection: yup.string().optional().default(undefined),
     voucher_id: yup.string().nullable().optional().default(null),
@@ -43,5 +58,6 @@ export const orderSchema: yup.ObjectSchema<OrderFormData> = yup
       )
       .optional()
       .default([]),
+    prefer_vip: yup.boolean().optional().default(false),
   })
   .required();
