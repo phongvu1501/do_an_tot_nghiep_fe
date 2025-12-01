@@ -34,11 +34,11 @@ export const orderSchema: yup.ObjectSchema<OrderFormData> = yup
         "Số lượng người không được vượt quá giới hạn",
         function (value) {
           const preferVip = this.parent.prefer_vip;
-          const maxPeople = preferVip ? 50 : 20;
+          const maxPeople = preferVip ? 30 : 20;
           if (value && value > maxPeople) {
             return this.createError({
               message: preferVip
-                ? "Số lượng người không được vượt quá 50 người (bàn VIP)"
+                ? "Số lượng người không được vượt quá 30 người (bàn VIP)"
                 : "Số lượng người không được vượt quá 20 người (bàn thường)",
             });
           }

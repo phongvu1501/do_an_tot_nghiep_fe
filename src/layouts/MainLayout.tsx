@@ -33,6 +33,11 @@ const MainLayout: React.FC = () => {
           title: "Lịch sử đặt bàn",
           description: "Xem lại tất cả các đơn đặt bàn của bạn tại nhà hàng",
         };
+      case "/profile":
+        return {
+          title: "Thông tin cá nhân",
+          description: "Quản lý thông tin tài khoản của bạn",
+        };
       case "/about":
         return {
           title: "Giới thiệu",

@@ -16,4 +16,14 @@ export const authService = {
     return response.data;
   },
   
+  updateProfile: async (data) => {
+    const response = await axiosInstance.put('/user/profile', data);
+    return response.data;
+  },
+  
+  changePassword: async (data) => {
+    const response = await axiosInstance.put('/user/password', data);
+    return response.data;
+  },
+  
 };

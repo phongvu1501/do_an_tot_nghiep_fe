@@ -45,7 +45,7 @@ const ReservationPopup: React.FC = () => {
   });
 
   const preferVip = watch("prefer_vip") ?? false;
-  const maxPeople = preferVip ? 40 : 20;
+  const maxPeople = preferVip ? 30 : 20;
 
   const resetAndClose = () => {
     reset();
@@ -80,7 +80,6 @@ const ReservationPopup: React.FC = () => {
   const onSubmit = async (data: OrderFormData) => {
     setIsLoading(true);
     try {
-      // Convert menu cart to the format expected by API
       const menus = menuCart.map((item) => ({
         menu_id: item.menu_id,
         quantity: item.quantity,

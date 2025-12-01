@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import MenuPage from "./pages/MenuPage";
 import HistoryPage from "./pages/HistoryPage";
 import AboutPage from "./pages/AboutPage";
+import ProfilePage from "./pages/ProfilePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import "./App.css";
 import MainLayout from "./layouts/MainLayout";
@@ -34,6 +35,7 @@ function App() {
                   <Route path="about" element={<AboutPage />} />
                   <Route path="menu" element={<MenuPage />} />
                   <Route path="history-orders" element={<HistoryPage />} />
+                  <Route path="profile" element={<ProfilePage />} />
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

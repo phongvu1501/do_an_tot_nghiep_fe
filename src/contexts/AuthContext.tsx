@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { storage } from "../utils/storage";
 import {
   AuthContext,
@@ -6,6 +12,14 @@ import {
   type AuthUser,
 } from "./authContextBase";
 import { setLogoutCallback } from "../utils/logoutTrigger";
+
+export const useAuthContext = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuthContext must be used within AuthProvider");
+  }
+  return context;
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
