@@ -20,10 +20,7 @@ export const orderSchema: yup.ObjectSchema<OrderFormData> = yup
     shift: yup
       .string()
       .required("Vui lòng chọn ca đặt bàn")
-      .oneOf(
-        ["morning", "afternoon", "evening", "night"],
-        "Vui lòng chọn ca ăn"
-      ),
+      .oneOf(["morning", "afternoon", "evening"], "Vui lòng chọn ca ăn"),
     num_people: yup
       .number()
       .typeError("Vui lòng nhập số lượng người")

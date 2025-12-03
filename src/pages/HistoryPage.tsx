@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Spin } from "antd";
 import { orderService } from "../services/order/orderServices";
-import type { OrderHistoryItem } from "../interfaces/order";  
+import type { OrderHistoryItem } from "../interfaces/order";
 import colors from "../config/colors";
 
 const HistoryPage: React.FC = () => {
@@ -69,6 +69,10 @@ const HistoryPage: React.FC = () => {
     }
 
     return `${numericValue.toLocaleString("vi-VN")}đ`;
+  };
+
+  const hasValidDeposit = (value: number | null | undefined): boolean => {
+    return value != null && value > 0;
   };
 
   const handleOrderClick = async (orderId: number) => {
@@ -145,35 +149,35 @@ const HistoryPage: React.FC = () => {
 
   return (
     <>
-    <div className="min-h-screen py-8">
+      <div className="min-h-screen py-8">
         <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {orders.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="mb-4">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
+          {orders.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="mb-4">
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <p className="text-gray-600 text-lg">Chưa có đặt bàn nào</p>
+              <p className="text-gray-500 text-sm mt-2">
+                Bạn chưa có lịch sử đặt bàn tại nhà hàng
+              </p>
             </div>
-            <p className="text-gray-600 text-lg">Chưa có đặt bàn nào</p>
-            <p className="text-gray-500 text-sm mt-2">
-              Bạn chưa có lịch sử đặt bàn tại nhà hàng
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {orders.map((order) => (
-              <div
-                key={order.id}
+          ) : (
+            <div className="space-y-6">
+              {orders.map((order) => (
+                <div
+                  key={order.id}
                   className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
                   onClick={() => handleOrderClick(order.id)}
                   role="button"
@@ -210,44 +214,44 @@ const HistoryPage: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
-                        <div className="flex items-center space-x-2">
-                          <svg
-                            className="w-5 h-5 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
-                          <span>
-                            <strong>Ngày:</strong>{" "}
-                            {formatDate(order.reservation_date)}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <svg
-                            className="w-5 h-5 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          <span>
-                            <strong>Ca:</strong> {order.shift_info.name} (
-                            {order.shift_info.time})
-                          </span>
-                        </div>
+                      <div className="flex items-center space-x-2">
+                        <svg
+                          className="w-5 h-5 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        <span>
+                          <strong>Ngày:</strong>{" "}
+                          {formatDate(order.reservation_date)}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <svg
+                          className="w-5 h-5 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <span>
+                          <strong>Ca:</strong> {order.shift_info.name} (
+                          {order.shift_info.time})
+                        </span>
+                      </div>
                     </div>
 
                     {order.status === "deposit_pending" &&
@@ -280,12 +284,12 @@ const HistoryPage: React.FC = () => {
                         </div>
                       )}
                   </div>
-                        </div>
+                </div>
               ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       <Modal
         open={detailModalVisible}
@@ -298,7 +302,7 @@ const HistoryPage: React.FC = () => {
         {detailLoading ? (
           <div className="flex items-center justify-center py-8">
             <Spin tip="Đang tải chi tiết..." />
-                      </div>
+          </div>
         ) : detailError ? (
           <p className="text-red-600 text-center py-4">{detailError}</p>
         ) : selectedOrder ? (
@@ -306,8 +310,8 @@ const HistoryPage: React.FC = () => {
             <div className="flex flex-wrap items-center gap-3">
               <h3
                 className="text-lg font-semibold"
-                          style={{ color: colors.primary.green }}
-                        >
+                style={{ color: colors.primary.green }}
+              >
                 Mã đặt bàn:{" "}
                 {selectedOrder.reservation_code || `#${selectedOrder.id}`}
               </h3>
@@ -332,10 +336,10 @@ const HistoryPage: React.FC = () => {
               </div>
               <div>
                 <strong>Số người:</strong> {selectedOrder.num_people}
-                        </div>
+              </div>
               <div>
                 <strong>Trạng thái:</strong> {selectedOrder.status_text}
-                    </div>
+              </div>
               {selectedOrder.status === "cancelled" &&
                 selectedOrder.cancellation_reason && (
                   <div>
@@ -370,39 +374,127 @@ const HistoryPage: React.FC = () => {
               <div>
                 <h4
                   className="text-sm font-semibold mb-3"
-                        style={{ color: colors.primary.green }}
-                      >
+                  style={{ color: colors.primary.green }}
+                >
                   Món đã đặt
-                      </h4>
+                </h4>
                 <div className="space-y-2">
                   {selectedOrder.menus.map((menuItem) => (
-                          <div
-                            key={menuItem.id}
+                    <div
+                      key={menuItem.id}
                       className="flex justify-between text-sm text-gray-700"
                     >
-                                <span>
+                      <span>
                         {menuItem.name} x{menuItem.quantity}
-                                </span>
+                      </span>
                       <span>{menuItem.total.toLocaleString("vi-VN")}đ</span>
-                          </div>
-                        ))}
-                      </div>
                     </div>
-                  )}
-
-            {selectedOrder.total_price > 0 && (
-              <div className="text-right">
-                <span className="text-sm font-semibold text-gray-700">
-                  Tổng tiền:{" "}
-                  <span
-                    style={{ color: colors.primary.green }}
-                    className="text-lg"
-                  >
-                    {formatCurrency(selectedOrder.total_price)}
-                  </span>
-                </span>
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* Tiền cọc */}
+            {(hasValidDeposit(selectedOrder.table_deposit) ||
+              hasValidDeposit(selectedOrder.food_deposit)) && (
+              <div className="pt-4 border-t border-gray-200">
+                <h4
+                  className="text-sm font-semibold mb-3"
+                  style={{ color: colors.primary.green }}
+                >
+                  Tiền cọc
+                </h4>
+                <div className="space-y-2 text-sm text-gray-700">
+                  {hasValidDeposit(selectedOrder.table_deposit) && (
+                    <div className="flex justify-between">
+                      <span>Tiền cọc bàn:</span>
+                      <span className="font-semibold">
+                        {formatCurrency(selectedOrder.table_deposit!)}
+                      </span>
+                    </div>
+                  )}
+                  {hasValidDeposit(selectedOrder.food_deposit) && (
+                    <div className="flex justify-between">
+                      <span>Tiền cọc đồ ăn:</span>
+                      <span className="font-semibold">
+                        {formatCurrency(selectedOrder.food_deposit!)}
+                      </span>
+                    </div>
+                  )}
+                  {(hasValidDeposit(selectedOrder.table_deposit) ||
+                    hasValidDeposit(selectedOrder.food_deposit)) && (
+                    <div className="flex justify-between pt-2 border-t border-gray-200">
+                      <span className="font-semibold">Tổng tiền cọc:</span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: colors.primary.green }}
+                      >
+                        {formatCurrency(
+                          (hasValidDeposit(selectedOrder.table_deposit)
+                            ? selectedOrder.table_deposit!
+                            : 0) +
+                            (hasValidDeposit(selectedOrder.food_deposit)
+                              ? selectedOrder.food_deposit!
+                              : 0)
+                        )}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Chi tiết hóa đơn */}
+            <div className="pt-4 border-t border-gray-200">
+              <h4
+                className="text-sm font-semibold mb-3"
+                style={{ color: colors.primary.green }}
+              >
+                Chi tiết hóa đơn
+              </h4>
+              <div className="space-y-2 text-sm text-gray-700">
+                {selectedOrder.subtotal != null && (
+                  <div className="flex justify-between">
+                    <span>Tổng tiền món ăn:</span>
+                    <span>{formatCurrency(selectedOrder.subtotal)}</span>
+                  </div>
+                )}
+                {selectedOrder.vat != null && selectedOrder.vat > 0 && (
+                  <div className="flex justify-between">
+                    <span>VAT (10%):</span>
+                    <span>{formatCurrency(selectedOrder.vat)}</span>
+                  </div>
+                )}
+                {selectedOrder.total_price != null && (
+                  <div className="flex justify-between pt-2 border-t border-gray-200">
+                    <span className="font-semibold">Tổng tiền:</span>
+                    <span className="font-semibold">
+                      {formatCurrency(selectedOrder.total_price)}
+                    </span>
+                  </div>
+                )}
+                {selectedOrder.voucher_discount != null &&
+                  selectedOrder.voucher_discount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Giảm giá voucher:</span>
+                      <span className="font-semibold">
+                        -{formatCurrency(selectedOrder.voucher_discount)}
+                      </span>
+                    </div>
+                  )}
+                {selectedOrder.final_amount != null && (
+                  <div className="flex justify-between pt-2 border-t border-gray-200">
+                    <span className="font-semibold">Thành tiền:</span>
+                    <span
+                      className="font-semibold"
+                      style={{ color: colors.primary.green }}
+                    >
+                      {formatCurrency(selectedOrder.final_amount)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         ) : (
           <p className="text-center text-sm text-gray-500">

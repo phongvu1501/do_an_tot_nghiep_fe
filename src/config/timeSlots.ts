@@ -1,6 +1,5 @@
 export const shifts = [
-  { value: "morning", label: "Sáng (6h-10h)" },
-  { value: "afternoon", label: "Trưa (10h-14h)" },
-  { value: "evening", label: "Chiều (14h-18h)" },
-  { value: "night", label: "Tối (18h-22h)" },
+  { value: "morning", label: "Sáng (8h-13h)" },
+  { value: "afternoon", label: "Trưa (13h-18h)" },
+  { value: "evening", label: "Chiều (18h-23h)" },
 ];

@@ -47,7 +47,14 @@ export interface OrderHistoryItem {
   shift_info: ShiftInfo;
   voucher_code?: string | null;
   cancellation_reason?: string | null;
+  subtotal?: number;
+  vat?: number;
   total_price: number;
+  voucher_discount?: number;
+  final_amount?: number;
+  deposit?: number | string | null;
+  table_deposit?: number | null;
+  food_deposit?: number | null;
   created_at: string;
   menus?: OrderHistoryMenuItem[];
   payment_url?: string | null;
