@@ -140,7 +140,7 @@ const ProfilePage: React.FC = () => {
       } else {
         messageApi.error(
           error.response?.data?.message ||
-            "Có lỗi xảy ra khi cập nhật thông tin"
+          "Có lỗi xảy ra khi cập nhật thông tin"
         );
       }
     } finally {
@@ -261,9 +261,8 @@ const ProfilePage: React.FC = () => {
                         type="text"
                         id="name"
                         {...register("name")}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                          errors.name ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.name ? "border-red-500" : "border-gray-300"
+                          }`}
                         placeholder="Nhập họ và tên"
                       />
                       {errors.name && (
@@ -290,9 +289,8 @@ const ProfilePage: React.FC = () => {
                         type="tel"
                         id="phone"
                         {...register("phone")}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                          errors.phone ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.phone ? "border-red-500" : "border-gray-300"
+                          }`}
                         placeholder="Nhập số điện thoại"
                       />
                       {errors.phone && (
@@ -321,9 +319,8 @@ const ProfilePage: React.FC = () => {
                         type="email"
                         id="email"
                         {...register("email")}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                          errors.email ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.email ? "border-red-500" : "border-gray-300"
+                          }`}
                         placeholder="Nhập địa chỉ email"
                       />
                       {errors.email && (
@@ -338,6 +335,12 @@ const ProfilePage: React.FC = () => {
                     </p>
                   )}
                 </div>
+                {/* <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Điểm tích lũy
+                  </label>
+                  <p className="text-gray-900 py-2">{user.points ?? 0}</p>
+                </div> */}
 
                 {!isEditing && (
                   <div className="pt-4 border-t border-gray-200">
@@ -384,9 +387,8 @@ const ProfilePage: React.FC = () => {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className={`px-4 py-2 rounded-md text-sm font-medium text-white transition-colors ${
-                        isLoading ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
+                      className={`px-4 py-2 rounded-md text-sm font-medium text-white transition-colors ${isLoading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                       style={{ backgroundColor: colors.primary.green }}
                       onMouseEnter={(e) => {
                         if (!isLoading) {
@@ -470,11 +472,10 @@ const ProfilePage: React.FC = () => {
                     type="password"
                     id="current_password"
                     {...registerPassword("current_password")}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                      passwordErrors.current_password
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${passwordErrors.current_password
+                      ? "border-red-500"
+                      : "border-gray-300"
+                      }`}
                     placeholder="Nhập mật khẩu hiện tại"
                   />
                   {passwordErrors.current_password && (
@@ -495,11 +496,10 @@ const ProfilePage: React.FC = () => {
                     type="password"
                     id="new_password"
                     {...registerPassword("new_password")}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                      passwordErrors.new_password
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${passwordErrors.new_password
+                      ? "border-red-500"
+                      : "border-gray-300"
+                      }`}
                     placeholder="Nhập mật khẩu mới"
                   />
                   {passwordErrors.new_password && (
@@ -521,11 +521,10 @@ const ProfilePage: React.FC = () => {
                     type="password"
                     id="new_password_confirmation"
                     {...registerPassword("new_password_confirmation")}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                      passwordErrors.new_password_confirmation
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${passwordErrors.new_password_confirmation
+                      ? "border-red-500"
+                      : "border-gray-300"
+                      }`}
                     placeholder="Nhập lại mật khẩu mới"
                   />
                   {passwordErrors.new_password_confirmation && (
@@ -549,9 +548,8 @@ const ProfilePage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isChangingPassword}
-                    className={`px-4 py-2 rounded-md text-sm font-medium text-white transition-colors ${
-                      isChangingPassword ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`px-4 py-2 rounded-md text-sm font-medium text-white transition-colors ${isChangingPassword ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     style={{ backgroundColor: colors.primary.green }}
                     onMouseEnter={(e) => {
                       if (!isChangingPassword) {

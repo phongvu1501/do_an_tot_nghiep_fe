@@ -17,6 +17,7 @@ export interface User {
   email: string;
   phone?: string;
   role: string;
+  points: number;
   created_at: string;
   updated_at: string;
 }
