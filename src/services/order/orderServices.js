@@ -13,6 +13,10 @@ export const orderService = {
     const response = await axiosInstance.get(`/dat-ban-an/${id}`);
     return response.data;
   },
+  cancelReservation: async (id, data) => {
+    const response = await axiosInstance.put(`/dat-ban-an/${id}/cancel`, data);
+    return response.data;
+  },
 };
 
 

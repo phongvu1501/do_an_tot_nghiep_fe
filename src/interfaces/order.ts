@@ -58,6 +58,9 @@ export interface OrderHistoryItem {
   created_at: string;
   menus?: OrderHistoryMenuItem[];
   payment_url?: string | null;
+  refund_days?: number;
+  can_be_refunded?: boolean;
+  days_until_reservation?: number;
 }
 
 export interface Pagination {

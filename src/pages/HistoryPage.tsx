@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Spin } from "antd";
+import { Modal, Spin, Input, Select, message } from "antd";
 import { orderService } from "../services/order/orderServices";
 import type { OrderHistoryItem } from "../interfaces/order";
 import colors from "../config/colors";
@@ -14,6 +14,13 @@ const HistoryPage: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<OrderHistoryItem | null>(
     null
   );
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
+  const [cancelOrderId, setCancelOrderId] = useState<number | null>(null);
+  const [cancelOrder, setCancelOrder] = useState<OrderHistoryItem | null>(null);
+  const [refundBank, setRefundBank] = useState<string>("");
+  const [refundAccountNumber, setRefundAccountNumber] = useState("");
+  const [cancelling, setCancelling] = useState(false);
+  const [refundDays, setRefundDays] = useState<number>(1);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -24,11 +31,16 @@ const HistoryPage: React.FC = () => {
 
         if (response.success && response.data) {
           setOrders(response.data);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if ((response as any).refund_days) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            setRefundDays((response as any).refund_days);
+          }
         } else {
           setError("Không thể tải lịch sử đặt bàn");
         }
       } catch (err) {
-        console.error("Error fetching history:", err);
+        console.error("Error", err);
         setError("Có lỗi xảy ra khi tải lịch sử đặt bàn");
       } finally {
         setLoading(false);
@@ -91,7 +103,7 @@ const HistoryPage: React.FC = () => {
         );
       }
     } catch (err) {
-      console.error("Error fetching reservation detail:", err);
+      console.error("Error", err);
       setDetailError("Có lỗi xảy ra khi tải chi tiết đơn đặt bàn.");
     } finally {
       setDetailLoading(false);
@@ -103,6 +115,86 @@ const HistoryPage: React.FC = () => {
     setDetailModalVisible(false);
     setSelectedOrder(null);
     setDetailError(null);
+  };
+
+  const handleCancelClick = (e: React.MouseEvent, order: OrderHistoryItem) => {
+    e.stopPropagation();
+    setCancelOrder(order);
+    setCancelOrderId(order.id);
+    setRefundBank("");
+    setRefundAccountNumber("");
+    setCancelModalVisible(true);
+  };
+
+  const handleCancelOrder = async () => {
+    if (!cancelOrderId) return;
+
+    // Nếu có thể hoàn tiền, kiểm tra ngân hàng và số tài khoản
+    if (cancelOrder?.can_be_refunded) {
+      if (!refundBank) {
+        message.error("Vui lòng chọn ngân hàng!");
+        return;
+      }
+      if (!refundAccountNumber.trim()) {
+        message.error("Vui lòng nhập số tài khoản để hoàn tiền!");
+        return;
+      }
+    }
+
+    setCancelling(true);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const data: any = {};
+      if (cancelOrder?.can_be_refunded) {
+        data.refund_bank = refundBank;
+        data.refund_account_number = refundAccountNumber.trim();
+      }
+      if (cancelOrder?.depsection) {
+        data.cancellation_reason = cancelOrder.depsection;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = await (orderService as any).cancelReservation(
+        cancelOrderId,
+        data
+      );
+
+      if (response.success) {
+        message.success(response.message || "Đã hủy đơn đặt bàn thành công!");
+        setCancelModalVisible(false);
+        setCancelOrder(null);
+        setCancelOrderId(null);
+        setRefundBank("");
+        setRefundAccountNumber("");
+        // Reload danh sách
+        const historyResponse = await orderService.getHistory();
+        if (historyResponse.success && historyResponse.data) {
+          setOrders(historyResponse.data);
+        }
+      } else {
+        message.error(response.message || "Không thể hủy đơn đặt bàn");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      message.error(
+        err.response?.data?.message ||
+          "Có lỗi xảy ra khi hủy đơn đặt bàn. Vui lòng thử lại!"
+      );
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  const closeCancelModal = () => {
+    setCancelModalVisible(false);
+    setCancelOrder(null);
+    setCancelOrderId(null);
+    setRefundBank("");
+    setRefundAccountNumber("");
+  };
+
+  const canCancelOrder = (order: OrderHistoryItem): boolean => {
+    return order.status !== "completed" && order.status !== "cancelled";
   };
 
   if (loading) {
@@ -254,9 +346,9 @@ const HistoryPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {order.status === "deposit_pending" &&
-                      order.payment_url && (
-                        <div className="pt-4 border-t border-gray-200">
+                    <div className="pt-4 border-t border-gray-200 flex gap-2 flex-wrap">
+                      {order.status === "deposit_pending" &&
+                        order.payment_url && (
                           <a
                             href={order.payment_url}
                             target="_blank"
@@ -281,8 +373,25 @@ const HistoryPage: React.FC = () => {
                           >
                             Thanh toán tiền cọc
                           </a>
-                        </div>
+                        )}
+                      {canCancelOrder(order) && (
+                        <button
+                          onClick={(e) => handleCancelClick(e, order)}
+                          className="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-semibold transition-colors text-white"
+                          style={{
+                            backgroundColor: "#ef4444",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#dc2626";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "#ef4444";
+                          }}
+                        >
+                          Hủy đơn
+                        </button>
                       )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -500,6 +609,185 @@ const HistoryPage: React.FC = () => {
           <p className="text-center text-sm text-gray-500">
             Không có thông tin chi tiết để hiển thị.
           </p>
+        )}
+      </Modal>
+
+      {/* Modal xác nhận hủy đơn */}
+      <Modal
+        open={cancelModalVisible}
+        onCancel={closeCancelModal}
+        onOk={handleCancelOrder}
+        okText="Xác nhận hủy"
+        cancelText="Hủy"
+        confirmLoading={cancelling}
+        centered
+        width={500}
+        title={
+          <span style={{ color: "#ef4444" }}>
+            <svg
+              className="w-5 h-5 inline-block mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            Xác nhận hủy đơn đặt bàn
+          </span>
+        }
+      >
+        {cancelOrder && (
+          <div className="space-y-4">
+            <p>
+              Bạn có chắc muốn hủy đơn đặt bàn{" "}
+              <strong>
+                {cancelOrder.reservation_code || `#${cancelOrder.id}`}
+              </strong>
+              ?
+            </p>
+
+            {cancelOrder.can_be_refunded &&
+              cancelOrder.deposit &&
+              (typeof cancelOrder.deposit === "number"
+                ? cancelOrder.deposit > 0
+                : parseFloat(cancelOrder.deposit || "0") > 0) && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start space-x-2">
+                    <svg
+                      className="w-5 h-5 text-blue-600 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-blue-900 mb-1">
+                        Thông tin hoàn tiền
+                      </p>
+                      <p className="text-sm text-blue-800 mb-3">
+                        Số tiền cọc sẽ được hoàn:{" "}
+                        <strong className="text-green-600">
+                          {typeof cancelOrder.deposit === "number"
+                            ? cancelOrder.deposit.toLocaleString("vi-VN")
+                            : cancelOrder.deposit}{" "}
+                          đ
+                        </strong>
+                      </p>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-blue-900 mb-1">
+                            Ngân hàng <span className="text-red-500">*</span>
+                          </label>
+                          <Select
+                            placeholder="Chọn ngân hàng"
+                            value={refundBank}
+                            onChange={(value) => setRefundBank(value)}
+                            className="w-full"
+                            options={[
+                              { value: "mbank", label: "MBank" },
+                              { value: "techcombank", label: "Techcombank" },
+                              { value: "vietcombank", label: "Vietcombank" },
+                              { value: "bidv", label: "BIDV" },
+                              { value: "agribank", label: "Agribank" },
+                              { value: "vietinbank", label: "VietinBank" },
+                              { value: "acb", label: "ACB" },
+                              { value: "vpbank", label: "VPBank" },
+                              { value: "tpbank", label: "TPBank" },
+                              { value: "shb", label: "SHB" },
+                              { value: "hdbank", label: "HDBank" },
+                              { value: "msb", label: "MSB" },
+                              { value: "ocb", label: "OCB" },
+                              { value: "vib", label: "VIB" },
+                              { value: "seabank", label: "SeABank" },
+                              { value: "eximbank", label: "Eximbank" },
+                              { value: "scb", label: "SCB" },
+                              { value: "vietabank", label: "VietABank" },
+                              {
+                                value: "lienvietpostbank",
+                                label: "LienVietPostBank",
+                              },
+                              { value: "pvcombank", label: "PVcomBank" },
+                              { value: "publicbank", label: "PublicBank" },
+                              { value: "saigonbank", label: "SaigonBank" },
+                            ]}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-blue-900 mb-1">
+                            Số tài khoản <span className="text-red-500">*</span>
+                          </label>
+                          <Input
+                            placeholder="Nhập số tài khoản"
+                            value={refundAccountNumber}
+                            onChange={(e) =>
+                              setRefundAccountNumber(e.target.value)
+                            }
+                            maxLength={20}
+                            className="w-full"
+                          />
+                          <p className="text-xs text-blue-600 mt-1">
+                            Vui lòng kiểm tra kĩ thông tin{" "}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            {!cancelOrder.can_be_refunded &&
+              cancelOrder.deposit &&
+              (typeof cancelOrder.deposit === "number"
+                ? cancelOrder.deposit > 0
+                : parseFloat(cancelOrder.deposit || "0") > 0) && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="flex items-start space-x-2">
+                    <svg
+                      className="w-5 h-5 text-yellow-600 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-yellow-900 mb-1">
+                        Lưu ý về hoàn tiền
+                      </p>
+                      <p className="text-sm text-yellow-800">
+                        Đơn này không đủ điều kiện để hoàn tiền cọc vì bạn hủy
+                        quá gần ngày đặt bàn (
+                        {/* <strong>
+                        {Math.ceil(cancelOrder.days_until_reservation || 0)}{" "}
+                        ngày
+                      </strong> */}
+                        tối thiểu:{" "}
+                        <strong>
+                          {cancelOrder.refund_days || refundDays} ngày
+                        </strong>
+                        ). Tiền cọc sẽ không được hoàn lại.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+          </div>
         )}
       </Modal>
     </>

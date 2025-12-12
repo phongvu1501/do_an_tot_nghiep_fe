@@ -45,7 +45,7 @@ const ReservationPopup: React.FC = () => {
   });
 
   const preferVip = watch("prefer_vip") ?? false;
-  const maxPeople = preferVip ? 30 : 20;
+  const maxPeople = preferVip ? 50 : 160;
 
   const resetAndClose = () => {
     reset();
