@@ -471,10 +471,39 @@ const HistoryPage: React.FC = () => {
               </div>
               {selectedOrder.status === "cancelled" &&
                 selectedOrder.cancellation_reason && (
-                  <div>
-                    <strong>Lý do hủy:</strong>{" "}
-                    {selectedOrder.cancellation_reason}
-                  </div>
+                  <>
+                    {(() => {
+                      const reason = selectedOrder.cancellation_reason;
+                      const accountInfoMatch = reason.match(
+                        /Số tài khoản hoàn tiền:\s*(.+)/
+                      );
+                      const accountInfo = accountInfoMatch
+                        ? accountInfoMatch[1].trim()
+                        : null;
+                      const cancellationReasonOnly = accountInfoMatch
+                        ? reason.substring(0, accountInfoMatch.index).trim()
+                        : reason;
+
+                      return (
+                        <>
+                          {cancellationReasonOnly && (
+                            <div>
+                              <strong>Lý do hủy:</strong>{" "}
+                              {cancellationReasonOnly}
+                            </div>
+                          )}
+                          {accountInfo && (
+                            <div>
+                              <strong>Tài khoản hoàn tiền:</strong>{" "}
+                              <span className="text-blue-600 font-semibold">
+                                {accountInfo}
+                              </span>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </>
                 )}
               {selectedOrder.voucher_code && (
                 <div>
