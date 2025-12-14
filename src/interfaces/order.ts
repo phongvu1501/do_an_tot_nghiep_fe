@@ -61,6 +61,9 @@ export interface OrderHistoryItem {
   refund_days?: number;
   can_be_refunded?: boolean;
   days_until_reservation?: number;
+  refunded_at?: string | null;
+  is_refunded?: boolean;
+  refund_bill_image?: string | null;
 }
 
 export interface Pagination {

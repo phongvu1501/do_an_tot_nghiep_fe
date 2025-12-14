@@ -21,6 +21,8 @@ const HistoryPage: React.FC = () => {
   const [refundAccountNumber, setRefundAccountNumber] = useState("");
   const [cancelling, setCancelling] = useState(false);
   const [refundDays, setRefundDays] = useState<number>(1);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+  const [imageModalSrc, setImageModalSrc] = useState<string>("");
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -303,6 +305,24 @@ const HistoryPage: React.FC = () => {
                       <div className="text-sm text-gray-500">
                         Đặt lúc: {order.created_at}
                       </div>
+                      {order.is_refunded && order.refunded_at && (
+                        <div className="text-sm text-green-600 font-semibold flex items-center gap-1">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          Đã hoàn tiền: {order.refunded_at}
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
@@ -464,6 +484,14 @@ const HistoryPage: React.FC = () => {
               <div>
                 <strong>Đặt lúc:</strong> {selectedOrder.created_at}
               </div>
+              {selectedOrder.is_refunded && selectedOrder.refunded_at && (
+                <div className="col-span-2">
+                  <strong className="text-green-600">Đã hoàn tiền:</strong>{" "}
+                  <span className="text-green-600 font-semibold">
+                    {selectedOrder.refunded_at}
+                  </span>
+                </div>
+              )}
             </div>
             {selectedOrder.depsection && (
               <div>
@@ -604,6 +632,70 @@ const HistoryPage: React.FC = () => {
                 )}
               </div>
             </div>
+
+            {/* Thông tin hoàn tiền */}
+            {(selectedOrder.is_refunded ||
+              selectedOrder.refunded_at ||
+              selectedOrder.refund_bill_image) && (
+              <div className="pt-4 border-t border-gray-200">
+                <h4
+                  className="text-sm font-semibold mb-3 flex items-center gap-2"
+                  style={{ color: colors.primary.green }}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Thông tin hoàn tiền
+                </h4>
+                <div className="space-y-3">
+                  {selectedOrder.refunded_at && (
+                    <div className="text-sm text-gray-700">
+                      <strong>Ngày hoàn tiền:</strong>{" "}
+                      <span className="text-green-600 font-semibold">
+                        {selectedOrder.refunded_at}
+                      </span>
+                    </div>
+                  )}
+                  {selectedOrder.refund_bill_image ? (
+                    <div>
+                      <strong className="text-sm text-gray-700 block mb-2">
+                        Ảnh bill hoàn tiền:
+                      </strong>
+                      <div className="relative">
+                        <img
+                          src={selectedOrder.refund_bill_image}
+                          alt="Ảnh bill hoàn tiền"
+                          className="rounded-lg border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity max-w-full"
+                          style={{ maxHeight: "300px" }}
+                          onClick={() => {
+                            setImageModalSrc(selectedOrder.refund_bill_image!);
+                            setImageModalVisible(true);
+                          }}
+                          onError={(e) => {
+                            e.currentTarget.src =
+                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Crect width='300' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%236b7280' font-family='Arial' font-size='14'%3EKhông thể tải ảnh%3C/text%3E%3C/svg%3E";
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-500 italic">
+                      Chưa có ảnh bill hoàn tiền
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-center text-sm text-gray-500">
@@ -789,6 +881,25 @@ const HistoryPage: React.FC = () => {
               )}
           </div>
         )}
+      </Modal>
+
+      {/* Modal xem ảnh bill hoàn tiền */}
+      <Modal
+        open={imageModalVisible}
+        onCancel={() => setImageModalVisible(false)}
+        footer={null}
+        centered
+        width={800}
+        title="Ảnh bill hoàn tiền"
+      >
+        <div className="text-center">
+          <img
+            src={imageModalSrc}
+            alt="Ảnh bill hoàn tiền"
+            className="max-w-full h-auto rounded-lg"
+            style={{ maxHeight: "70vh" }}
+          />
+        </div>
       </Modal>
     </>
   );
