@@ -49,6 +49,12 @@ const MainLayout: React.FC = () => {
           description:
             "Khám phá hành trình phát triển và dịch vụ của DATBAN Quán.",
         };
+      case "/comments":
+        return {
+          title: "Đánh giá của khách hàng",
+          description:
+            "Trải nghiệm và đánh giá từ khách hàng về dịch vụ của chúng tôi.",
+        };
       default:
         return {
           title: "Trang chủ",

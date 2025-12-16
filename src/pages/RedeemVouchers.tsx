@@ -62,19 +62,17 @@ export default function RedeemVouchers() {
     const handleRedeemPoints = async (tierId: number) => {
         if (!user || !setUser) return;
 
-        setRedeemingTier(tierId); // bật loading cho nút
+        setRedeemingTier(tierId);
 
         try {
             const response = await voucherService.redeemPoints(tierId);
 
             if (response.status && response.data) {
-                // cập nhật điểm ngay lập tức
                 setUser({
                     ...user,
                     points: response.data.remaining_points,
                 });
 
-                // cập nhật danh sách voucher
                 setVouchers(prev => [response.data.voucher, ...prev]);
 
                 messageApi.success(response.message || "Đổi điểm thành công!");
@@ -85,7 +83,7 @@ export default function RedeemVouchers() {
             console.error(err);
             messageApi.error("Có lỗi xảy ra khi đổi điểm");
         } finally {
-            setRedeemingTier(null); // tắt loading cho nút
+            setRedeemingTier(null);
         }
     };
 
@@ -123,7 +121,7 @@ export default function RedeemVouchers() {
                                     <p className="text-gray-600 mb-1">Điểm cần: {t.points_required}</p>
                                     <p className="text-gray-600 mb-1">Giảm: {t.discount_percent}%</p>
                                     <p className="text-gray-600 mb-1">
-                                       Giá trị đơn hàng sử dụng: {parseFloat(t.min_order_value).toLocaleString()}đ
+                                        Giá trị đơn hàng sử dụng: {parseFloat(t.min_order_value).toLocaleString()}đ
                                     </p>
                                     <p className="text-gray-600 mb-1">
                                         Giá trị giảm tối đa: {parseFloat(t.max_discount_value).toLocaleString()}đ
