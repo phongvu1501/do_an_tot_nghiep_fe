@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Spin, Input, Select, message } from "antd";
+import { Modal, Spin, Input, Select, message, Rate } from "antd";
 import { orderService } from "../services/order/orderServices";
+import { commentService } from "../services/comment/commentServices";
 import type { OrderHistoryItem } from "../interfaces/order";
+import type { Comment } from "../services/comment/commentTypes";
 import colors from "../config/colors";
 
 const HistoryPage: React.FC = () => {
@@ -23,6 +25,17 @@ const HistoryPage: React.FC = () => {
   const [refundDays, setRefundDays] = useState<number>(1);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [imageModalSrc, setImageModalSrc] = useState<string>("");
+
+  // Review states
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [reviewingOrderId, setReviewingOrderId] = useState<number | null>(null);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState<string>("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [orderReviews, setOrderReviews] = useState<Record<number, Comment>>({});
+  const [loadingReviews, setLoadingReviews] = useState<Record<number, boolean>>(
+    {}
+  );
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -199,6 +212,147 @@ const HistoryPage: React.FC = () => {
     return order.status !== "completed" && order.status !== "cancelled";
   };
 
+  // Fetch review for an order
+  const fetchReview = async (orderId: number) => {
+    if (orderReviews[orderId] !== undefined) return; // Already loaded
+
+    setLoadingReviews((prev) => ({ ...prev, [orderId]: true }));
+    try {
+      const response = await commentService.getReviewByReservation(orderId);
+      if (response.data) {
+        setOrderReviews((prev) => ({ ...prev, [orderId]: response.data! }));
+      } else {
+        // Mark as loaded but no review exists
+        setOrderReviews((prev) => ({
+          ...prev,
+          [orderId]: null as unknown as Comment,
+        }));
+      }
+    } catch (err) {
+      console.error("Error fetching review:", err);
+    } finally {
+      setLoadingReviews((prev) => ({ ...prev, [orderId]: false }));
+    }
+  };
+
+  // Open review modal
+  const handleReviewClick = async (e: React.MouseEvent, orderId: number) => {
+    e.stopPropagation();
+    setReviewingOrderId(orderId);
+
+    // Load existing review if any
+    let review = orderReviews[orderId];
+
+    // If not loaded yet, fetch it
+    if (review === undefined) {
+      setLoadingReviews((prev) => ({ ...prev, [orderId]: true }));
+      try {
+        const response = await commentService.getReviewByReservation(orderId);
+        if (response.data) {
+          review = response.data;
+          setOrderReviews((prev) => ({ ...prev, [orderId]: review! }));
+        } else {
+          setOrderReviews((prev) => ({
+            ...prev,
+            [orderId]: null as unknown as Comment,
+          }));
+        }
+      } catch (err) {
+        console.error("Error fetching review:", err);
+      } finally {
+        setLoadingReviews((prev) => ({ ...prev, [orderId]: false }));
+      }
+    }
+
+    // Set form values
+    if (review && review !== null) {
+      setReviewRating(review.rating);
+      setReviewComment(review.comment || "");
+    } else {
+      setReviewRating(5);
+      setReviewComment("");
+    }
+
+    setReviewModalVisible(true);
+  };
+
+  // Submit review
+  const handleSubmitReview = async () => {
+    if (!reviewingOrderId) return;
+
+    if (!reviewRating || reviewRating < 1 || reviewRating > 5) {
+      message.error("Vui lòng chọn số sao từ 1 đến 5!");
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      const payload = {
+        rating: reviewRating,
+        comment: reviewComment.trim() || "",
+      };
+
+      const response = await commentService.submitReview(
+        reviewingOrderId,
+        payload
+      );
+
+      if (response.data) {
+        message.success(response.message || "Đánh giá đã được gửi thành công!");
+        setOrderReviews((prev) => ({
+          ...prev,
+          [reviewingOrderId]: response.data!,
+        }));
+        setReviewModalVisible(false);
+        setReviewingOrderId(null);
+        setReviewRating(5);
+        setReviewComment("");
+      } else {
+        message.error(response.message || "Không thể gửi đánh giá");
+      }
+    } catch (err: unknown) {
+      console.error("Error submitting review:", err);
+      const error = err as { response?: { data?: { message?: string } } };
+      message.error(
+        error.response?.data?.message ||
+          "Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại!"
+      );
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  // Close review modal
+  const closeReviewModal = () => {
+    setReviewModalVisible(false);
+    setReviewingOrderId(null);
+    setReviewRating(5);
+    setReviewComment("");
+  };
+
+  // Check if order can be reviewed
+  const canReviewOrder = (order: OrderHistoryItem): boolean => {
+    return order.status === "completed";
+  };
+
+  // Load reviews for completed orders
+  useEffect(() => {
+    const loadReviews = async () => {
+      const completedOrders = orders.filter((o) => o.status === "completed");
+      for (const order of completedOrders) {
+        // Only fetch if not already loaded
+        if (orderReviews[order.id] === undefined && !loadingReviews[order.id]) {
+          await fetchReview(order.id);
+        }
+      }
+    };
+
+    if (orders.length > 0) {
+      loadReviews();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orders.length]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center py-12">
@@ -365,6 +519,87 @@ const HistoryPage: React.FC = () => {
                         </span>
                       </div>
                     </div>
+
+                    {/* Review Section */}
+                    {canReviewOrder(order) && (
+                      <div className="pt-4 border-t border-gray-200">
+                        {loadingReviews[order.id] ? (
+                          <div className="flex items-center justify-center py-2">
+                            <Spin size="small" />
+                            <span className="ml-2 text-sm text-gray-500">
+                              Đang tải đánh giá...
+                            </span>
+                          </div>
+                        ) : orderReviews[order.id] ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-semibold text-gray-700">
+                                Đánh giá của bạn:
+                              </span>
+                              <Rate
+                                disabled
+                                value={orderReviews[order.id].rating}
+                                className="text-sm"
+                              />
+                            </div>
+                            {orderReviews[order.id].comment && (
+                              <p className="text-sm text-gray-600 italic">
+                                "{orderReviews[order.id].comment}"
+                              </p>
+                            )}
+                            <button
+                              onClick={(e) => handleReviewClick(e, order.id)}
+                              className="text-sm"
+                              style={{ color: colors.primary.green }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.textDecoration =
+                                  "underline";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.textDecoration = "none";
+                              }}
+                            >
+                              Sửa đánh giá
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={(e) => handleReviewClick(e, order.id)}
+                            className="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-semibold transition-colors"
+                            style={{
+                              backgroundColor: colors.primary.yellow,
+                              color: colors.primary.green,
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.primary.green;
+                              e.currentTarget.style.color = "white";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                colors.primary.yellow;
+                              e.currentTarget.style.color =
+                                colors.primary.green;
+                            }}
+                          >
+                            <svg
+                              className="w-4 h-4 mr-2"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                              />
+                            </svg>
+                            Đánh giá
+                          </button>
+                        )}
+                      </div>
+                    )}
 
                     <div className="pt-4 border-t border-gray-200 flex gap-2 flex-wrap">
                       {order.status === "deposit_pending" &&
@@ -627,7 +862,7 @@ const HistoryPage: React.FC = () => {
                 )}
                 {selectedOrder.vat != null && selectedOrder.vat > 0 && (
                   <div className="flex justify-between">
-                    <span>VAT (10%):</span>
+                    <span>VAT (8%):</span>
                     <span>{formatCurrency(selectedOrder.vat)}</span>
                   </div>
                 )}
@@ -928,6 +1163,77 @@ const HistoryPage: React.FC = () => {
             className="max-w-full h-auto rounded-lg"
             style={{ maxHeight: "70vh" }}
           />
+        </div>
+      </Modal>
+
+      {/* Modal đánh giá */}
+      <Modal
+        open={reviewModalVisible}
+        onCancel={closeReviewModal}
+        onOk={handleSubmitReview}
+        okText={
+          orderReviews[reviewingOrderId || 0]
+            ? "Cập nhật đánh giá"
+            : "Gửi đánh giá"
+        }
+        cancelText="Hủy"
+        confirmLoading={submittingReview}
+        centered
+        width={600}
+        title={
+          <div className="flex items-center gap-2">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              style={{ color: colors.primary.green }}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+              />
+            </svg>
+            <span style={{ color: colors.primary.green }}>
+              {orderReviews[reviewingOrderId || 0]
+                ? "Cập nhật đánh giá"
+                : "Đánh giá đơn đặt bàn"}
+            </span>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Số sao đánh giá <span className="text-red-500">*</span>
+            </label>
+            <Rate
+              value={reviewRating}
+              onChange={setReviewRating}
+              className="text-2xl"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Chọn số sao từ 1 đến 5 để đánh giá chất lượng dịch vụ
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Bình luận (tùy chọn)
+            </label>
+            <Input.TextArea
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              placeholder="Chia sẻ cảm nhận của bạn về dịch vụ..."
+              rows={4}
+              maxLength={1000}
+              showCount
+              className="w-full"
+            />
+            <p className="text-xs text-gray-500 mt-1">Tối đa 1000 ký tự</p>
+          </div>
         </div>
       </Modal>
     </>

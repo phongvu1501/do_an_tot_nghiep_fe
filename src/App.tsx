@@ -6,7 +6,6 @@ import MenuPage from "./pages/MenuPage";
 import HistoryPage from "./pages/HistoryPage";
 import RedeemVoucherPage from "./pages/RedeemVouchers.tsx";
 import AboutPage from "./pages/AboutPage";
-import CommentPage from "./pages/CommentPage.tsx";
 import ProfilePage from "./pages/ProfilePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import "./App.css";
@@ -36,9 +35,11 @@ function App() {
                   <Route index element={<HomePage />} />
                   <Route path="about" element={<AboutPage />} />
                   <Route path="menu" element={<MenuPage />} />
-                  <Route path="comments" element={<CommentPage />} />
                   <Route path="history-orders" element={<HistoryPage />} />
-                  <Route path="redeem-voucher" element={<RedeemVoucherPage />} />
+                  <Route
+                    path="redeem-voucher"
+                    element={<RedeemVoucherPage />}
+                  />
                   <Route path="profile" element={<ProfilePage />} />
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />

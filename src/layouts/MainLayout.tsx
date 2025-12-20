@@ -36,7 +36,8 @@ const MainLayout: React.FC = () => {
       case "/redeem-voucher":
         return {
           title: "Đổi voucher",
-          description: "Sử dụng điểm tích lũy để đổi lấy các voucher hấp dẫn từ nhà hàng của chúng tôi",
+          description:
+            "Sử dụng điểm tích lũy để đổi lấy các voucher hấp dẫn từ nhà hàng của chúng tôi",
         };
       case "/profile":
         return {
@@ -48,12 +49,6 @@ const MainLayout: React.FC = () => {
           title: "Giới thiệu",
           description:
             "Khám phá hành trình phát triển và dịch vụ của DATBAN Quán.",
-        };
-      case "/comments":
-        return {
-          title: "Đánh giá của khách hàng",
-          description:
-            "Trải nghiệm và đánh giá từ khách hàng về dịch vụ của chúng tôi.",
         };
       default:
         return {

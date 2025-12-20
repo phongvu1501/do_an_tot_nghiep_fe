@@ -40,12 +40,56 @@ const ReservationPopup: React.FC = () => {
     watch,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<OrderFormData>({
     resolver: yupResolver(orderSchema),
   });
 
   const preferVip = watch("prefer_vip") ?? false;
+  const reservationDate = watch("reservation_date");
+  const currentShift = watch("shift");
   const maxPeople = preferVip ? 50 : 160;
+
+  // Function để kiểm tra các ca nào cần disable
+  const getDisabledShifts = (): string[] => {
+    if (!reservationDate) return [];
+
+    const selectedDate = dayjs(reservationDate);
+    const today = dayjs().startOf("day");
+    const isToday = selectedDate.isSame(today, "day");
+
+    if (!isToday) return []; // Nếu không phải hôm nay, không disable ca nào
+
+    const currentHour = dayjs().hour();
+    const disabledShifts: string[] = [];
+
+    // Ca sáng: 8-13h, disable nếu hiện tại >= 13h
+    if (currentHour >= 13) {
+      disabledShifts.push("morning");
+    }
+
+    // Ca trưa: 13-18h, disable nếu hiện tại >= 18h
+    if (currentHour >= 18) {
+      disabledShifts.push("afternoon");
+    }
+
+    // Ca tối: 18-23h, disable nếu hiện tại >= 23h
+    if (currentHour >= 23) {
+      disabledShifts.push("evening");
+    }
+
+    return disabledShifts;
+  };
+
+  // Reset shift nếu ca đang chọn bị disable khi đổi ngày
+  React.useEffect(() => {
+    const disabledShifts = getDisabledShifts();
+
+    if (currentShift && disabledShifts.includes(currentShift)) {
+      // Reset shift về rỗng nếu ca đang chọn bị disable
+      setValue("shift", "");
+    }
+  }, [reservationDate, currentShift, setValue]);
 
   const resetAndClose = () => {
     reset();
@@ -243,11 +287,20 @@ const ReservationPopup: React.FC = () => {
                     }`}
                   >
                     <option value="">Chọn ca</option>
-                    {shifts.map((shift) => (
-                      <option key={shift.value} value={shift.value}>
-                        {shift.label}
-                      </option>
-                    ))}
+                    {shifts.map((shift) => {
+                      const disabledShifts = getDisabledShifts();
+                      const isDisabled = disabledShifts.includes(shift.value);
+
+                      return (
+                        <option
+                          key={shift.value}
+                          value={shift.value}
+                          disabled={isDisabled}
+                        >
+                          {shift.label}
+                        </option>
+                      );
+                    })}
                   </select>
                   {errors.shift && (
                     <p className="mt-1 text-sm text-red-600">

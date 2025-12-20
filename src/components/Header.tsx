@@ -90,12 +90,6 @@ const Header: React.FC = () => {
                 >
                   Giới thiệu
                 </Link>
-                <Link
-                  to="/comments"
-                  className="text-white hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Đánh giá
-                </Link>
 
                 <button
                   onClick={() => openPopup("order")}

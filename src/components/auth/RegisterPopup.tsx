@@ -1,14 +1,14 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { message, Spin } from "antd";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
+import type { InferType } from "yup";
 import colors from "../../config/colors";
 import { usePopup } from "../../hooks/usePopup";
-import type { RegisterData } from "../../interfaces";
 import { authService } from "../../services/auth/authServices";
 import { registerSchema } from "../../validation/auth";
 
-type RegisterFormData = RegisterData;
+type RegisterFormData = InferType<typeof registerSchema>;
 
 interface ApiError {
   response?: {
@@ -30,7 +30,7 @@ const RegisterPopup: React.FC = () => {
     formState: { errors },
     reset,
   } = useForm<RegisterFormData>({
-    resolver: yupResolver(registerSchema),
+    resolver: yupResolver(registerSchema) as Resolver<RegisterFormData>,
   });
 
   if (currentPopup !== "register") return null;
@@ -39,16 +39,20 @@ const RegisterPopup: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const res = await authService.register(data);
+      const res = await authService.register(
+        data as Parameters<typeof authService.register>[0]
+      );
 
       if (res.success) {
         messageApi.success(res.message || "Đăng ký thành công!");
-        closePopup();
         reset();
 
         setTimeout(() => {
-          openPopup("login");
-        }, 500);
+          closePopup();
+          setTimeout(() => {
+            openPopup("login");
+          }, 300);
+        }, 1000);
       } else {
         if (res.errors) {
           const allErrors = Object.values(res.errors).flat();

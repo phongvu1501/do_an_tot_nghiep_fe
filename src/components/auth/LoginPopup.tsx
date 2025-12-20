@@ -46,8 +46,11 @@ const LoginPopup: React.FC = () => {
         if (ctxLogin) ctxLogin(res.data.token, res.data.user);
         else if (setUser) setUser(res.data.user);
         messageApi.success(res.message || "Đăng nhập thành công!");
-        closePopup();
         reset();
+
+        setTimeout(() => {
+          closePopup();
+        }, 1000);
       } else {
         if (res.errors) {
           const allErrors = Object.values(res.errors).flat();
